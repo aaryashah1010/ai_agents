@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "fromEmail": "sales@steelcorp.com",
+    "fromName": "SteelCorp Logistics",
+    "subject": "Delivery Challan for Batch #8812",
+    "body": "Hi team, please find attached the delivery challan for the 50 steel sheets dispatched this morning. Kindly acknowledge receipt upon unloading so our drivers can clear the site.",
+    "attachmentNames": ["DC_8812_SteelCorp.pdf"]
+  },
+  {
+    "id": 2,
+    "fromEmail": "billing@globalparts.com",
+    "fromName": "Global Parts Ltd",
+    "subject": "Invoice INV-2026-9901 for April Services",
+    "body": "Dear Accounts Team, please find our tax invoice INV-2026-9901 attached for consulting services rendered in April 2026. Payment terms are net 30. Let us know if you need any adjustments.",
+    "attachmentNames": ["INV_2026_9901.pdf"]
+  },
+  {
+    "id": 3,
+    "fromEmail": "purchasing@megamart.com",
+    "fromName": "MegaMart Retail",
+    "subject": "New Purchase Order: PO-77621",
+    "body": "Hello, please process our enclosed purchase order PO-77621 for 500 units of Product X. We require delivery to our central warehouse by next Friday. Confirm receipt and estimated dispatch date.",
+    "attachmentNames": ["PO_77621_MegaMart.pdf"]
+  },
+  {
+    "id": 4,
+    "fromEmail": "rahul.sharma@gmail.com",
+    "fromName": "Rahul Sharma",
+    "subject": "Inquiry regarding bulk pricing for corporate gifting",
+    "body": "Hello, I am looking to procure around 200 customized premium notebooks for an upcoming corporate event. Could you share your catalog, lead times, and bulk discount rates?",
+    "attachmentNames": []
+  },
+  {
+    "id": 5,
+    "fromEmail": "finance@alphatrades.com",
+    "fromName": "Alpha Trades LLC",
+    "subject": "Payment Advice - Ref: EFT-99102",
+    "body": "Please note that an electronic fund transfer of INR 4,50,000 has been initiated today toward clearing outstanding balances. Refer to the attached advice sheet for transaction references.",
+    "attachmentNames": ["PA_EFT_99102.pdf"]
+  },
+  {
+    "id": 6,
+    "fromEmail": "procurement@buildsmart.com",
+    "fromName": "BuildSmart Infra",
+    "subject": "Request for Quotation - Cement Supply",
+    "body": "We are inviting bids for the supply of 1000 bags of Grade 53 cement for our smart city project site. Please submit your lowest quotation along with tax breakdowns by Monday evening.",
+    "attachmentNames": ["RFQ_Cement_BuildSmart.pdf"]
+  },
+  {
+    "id": 7,
+    "fromEmail": "v-jordan@apex-manufacturing.com",
+    "fromName": "Jordan Wells (Apex Manufacturing)",
+    "subject": "CRITICAL EDGE CASE: Mixed Multi-Intent Request",
+    "body": "Hi, I just reviewed the Vendor Quotation you sent over, but your logistics team sent us completely wrong items last week which is a massive issue. However, we urgently need to keep production running, so please find attached our official Customer Purchase Order PO-9002 for 100 units of Part B. Process this PO immediately while your support team fixes the original error.",
+    "attachmentNames": ["PO_9002_Apex_Signed.pdf"]
+  },
+  {
+    "id": 8,
+    "fromEmail": "anonymous-user@vague-comm.net",
+    "fromName": "Operations Desk",
+    "subject": "EDGE CASE: Highly Vague / Zero Context Document",
+    "body": "Please review the attached immediately and update the ledger entry based on what we discussed over our quick phone call yesterday morning. Needs to happen before the day ends.",
+    "attachmentNames": ["Doc_44102_Final.pdf"]
+  },
+  {
+    "id": 9,
+    "fromEmail": "angry_client@quickdelivery.com",
+    "fromName": "QuickDelivery Corp",
+    "subject": "COMPLAINT / ESCALATION: Shipment delayed by over 4 days",
+    "body": "This is completely unacceptable. Our consignment was supposed to arrive on Tuesday, and your tracking link still shows 'In Transit'. This delay is hurting our production lines. I want a refund or immediate tracking updates right now!",
+    "attachmentNames": []
+  },
+  {
+    "id": 10,
+    "fromEmail": "spammer99@marketing-leads.xyz",
+    "fromName": "Growth Hacking Agency",
+    "subject": "Boost your B2B sales leads by 10x using this new automated framework!",
+    "body": "Hey there, absolute game-changing opportunity! We noticed your company's web profile and wanted to offer a free trial of our automated scraping platform. No credit card required. Let's schedule a brief 10-minute discovery call this week?",
+    "attachmentNames": []
+  }
+]
