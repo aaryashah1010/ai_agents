@@ -26,16 +26,16 @@ GEMINI_API_KEY=AIzaSyYourGeminiApiKeyHere
 GMAIL_USER=your_email@gmail.com
 GMAIL_APP_PASSWORD=abcdefghijklmnop   # 16-character Google App Password
 DEV_MODE=false
-
+```
 2. File Initialization (data/draft_ledger.json)
 []
 
 3. Execution Commands
 # Terminal 1: Run Backend Gateway
-python -m uvicorn main:app --reload
+```python -m uvicorn main:app --reload```
 
 # Terminal 2: Run UI Workspace
-python -m streamlit run dashboard.py
+```python -m streamlit run dashboard.py```
 
 --- 
 ## Demo Steps
