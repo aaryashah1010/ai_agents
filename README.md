@@ -1,47 +1,48 @@
-# AI Enterprise ERP Assistant
+# AI Enterprise ERP Assistant Suite
 
-This project is a multi-agent system designed to handle incoming company emails. It reads the email content, figures out the business intent, and maps it to a specific ERP action automatically. 
-
-
+An event-driven, multi-agent AI system that captures incoming company emails from a live Gmail mailbox, analyzes business intent using Gemini, and creates staging drafts for manual verification via a **Human-in-the-Loop (HITL)** layout.
 
 ---
-Agent 1 (Email Classification) :
+# Agent 1: Email Classification Agent
 
-## Implementation and Working
+## Architecture Flow
+[ Live Gmail Inbox ] ──► (IMAP Listener Thread) ──► [ Gemini 2.5 Agent ]
+                                                            │
+                                                            ▼
+[ Streamlit UI Panel ] ◄── (Auto-Refresh Fragment) ◄── [ draft_ledger.json ]
 
-The system is split into three main layers: a frontend dashboard, a backend API gateway, and the AI agent core logic.
-
-### 1. Data Input & Dashboard (Streamlit)
-* **Single Runs:** You can select a pre-loaded test case from a dropdown menu or write an email manually. Clicking the run button bundles the metadata (sender name, email, subject, body, and attachments) into a JSON payload and sends it to the backend via an HTTP POST request.
-
-### 2. Backend Validation & Routing (FastAPI & Pydantic)
-* The FastAPI backend intercepts the incoming payload and passes it through a Pydantic model (`EmailInput`). This acts as a gatekeeper, making sure data types are correct before any AI code runs. 
-* If a file reload or manual entry leaves the tracking ID empty (`None`), the router safely converts it to a standard integer index (`0` or `1`) so downstream processing never throws validation errors.
-
-### 3. Agent Processing & Self-Healing (Gemini & Regex)
-* **Prompt Engineering:** The agent reads an enterprise instruction template, injects the email details dynamically, and asks Gemini 2.5 Flash for a structured JSON block containing the category, a tight summary, a recommended ERP action, and a human-review flag.
-* **Self-Healing Loop:** To prevent system crashes, the agent checks the raw text response from the API. If Gemini gets cut off mid-sentence due to free-tier output limitations, a regular expression (Regex) pattern automatically cuts in, extracts whatever variables were successfully generated, patches the missing JSON brackets on the fly, and flags the transaction for a human reviewer.
-* **Rate-Limit Control:** The API client script wraps requests in an exponential backoff retry loop. If a 429 quota exhaustion error is detected, the code automatically pauses for 20 seconds to let the rolling free-tier window reset instead of crashing the pipeline.
+1. **IMAP Listener:** Background thread checks your inbox every 3 seconds for `UNSEEN` mail and extracts text and attachment variables.
+2. **Staging Cache:** FastAPI validates data via Pydantic and saves records into `data/draft_ledger.json` as `Pending Review`.
+3. **Agent & Recovery:** Processes intent via `Gemini 2.5 Flash`. Employs a Regex self-healing layer to handle token cutoffs and manages rate limits via an exponential backoff loop.
+4. **Dashboard Panel:** Streamlit uses `@st.fragment` to auto-refresh and display unapproved drafts every 3 seconds without losing active user text focus.
 
 ---
 
-## Tech Stack
-* **FastAPI:** Core backend framework and API endpoints.
-* **Streamlit:** Frontend data interface and testing panels.
-* **Google GenAI SDK:** Model connection to utilize Gemini 2.5 Flash.
-* **Pydantic (v2):** Structured data enforcement and JSON validation.
+## Installation & Run
 
----
+1. Environment Configuration (`.env`)
+```env
+GEMINI_API_KEY=AIzaSyYourGeminiApiKeyHere
+GMAIL_USER=your_email@gmail.com
+GMAIL_APP_PASSWORD=abcdefghijklmnop   # 16-character Google App Password
+DEV_MODE=false
+```
+2. File Initialization (data/draft_ledger.json)
+[]
 
-## How to Setup and Run
+3. Execution Commands
+# Terminal 1: Run Backend Gateway
+```python -m uvicorn main:app --reload```
 
-1. Add your API credentials to a `.env` file in the root directory:
-   ```env
-   GEMINI_API_KEY=your_actual_api_key_here
-   DEV_MODE=false
+# Terminal 2: Run UI Workspace
+```python -m streamlit run dashboard.py```
 
-2. Open a terminal and start the FastAPI backend:
-   python -m uvicorn main:app --reload
+--- 
+## Demo Steps
+Open http://localhost:8501 and click ▶️ Start Agent.
 
-3. Open a second terminal and launch the Streamlit interface:
-python -m streamlit run dashboard.py
+Send an email to your registered GMAIL_USER address.
+
+The dashboard dropdown menu will auto-refresh within 3 seconds to reveal the unapproved draft.
+
+Audit the parameters, edit fields if required, and click "Approve & Commit to ERP"!
