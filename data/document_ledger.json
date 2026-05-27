@@ -1,14 +1,14 @@
 [
   {
     "doc_id": 1,
-    "status": "Pending Review",
+    "status": "Approved & Committed",
     "raw_input_text": "======================================================================== \n                         PURCHASE ORDER \n======================================================================== \nPO Number: PO-2026-8894                      PO Date: 2026-05-26 \nPayment Terms: Net 30 Days                   Delivery Date: 2026-06-01 \n------------------------------------------------------------------------ \n \nFROM (BUYER): \nABC Traders Pvt Ltd \n102, Enterprise Way, Industrial Zone, \nGandhinagar, Gujarat, India \nGSTIN: 24ABCDE1234F1Z5 \nEmail: purchasing@abctraders.com \n \nTO (SUPPLIER): \nGlobal Tools & Supplies \n456 Commerce Boulevard, Sector 4, \nMumbai, Maharashtra, India \nGSTIN: [NOT PROVIDED] \n \n------------------------------------------------------------------------ \nLINE ITEMS \n------------------------------------------------------------------------ \n#   Item Name    Description            Qty    Unit   Rate    Total (INR) \n------------------------------------------------------------------------ \n1   Product A    Industrial Grade A     20     Box    500.00   10,000.00 \n2   Product B    Premium Component B    10     Box    800.00    8,000.00 \n \n------------------------------------------------------------------------ \nFINANCIAL SUMMARY \n------------------------------------------------------------------------ \nSubtotal:                                              18,000.00 \nDiscount (10% Special Promotional Rate):               -1,800.00 \nTaxable Value:                                         16,200.00 \nIGST (18% Flat Rate):                                   2,916.00 \nRound Off:                                                  0.00 \n------------------------------------------------------------------------ \nTOTAL AMOUNT DUE:                                      19,116.00 \n======================================================================== \nNotes: Please acknowledge receipt of this purchase order and confirm  \nthe delivery schedule via email response.  \n========================================================================",
     "extracted_data": {
       "documentType": "Purchase Order",
       "confidence": 95,
       "vendor": {
         "name": "Global Tools & Supplies",
-        "gstin": null
+        "gstin": ""
       },
       "customer": {
         "name": "ABC Traders Pvt Ltd",
@@ -67,8 +67,113 @@
         "Line item specific tax percentages and amounts are not explicitly stated in the document.",
         "Line item specific discounts are not explicitly stated in the document."
       ],
-      "requiresHumanReview": true
+      "requiresHumanReview": false
     },
     "timestamp": "2026-05-27 11:14:50"
+  },
+  {
+    "doc_id": 2,
+    "status": "Approved & Committed",
+    "raw_input_text": "======================================================================== \n                       PRODUCTION PROCUREMENT SHEET \n======================================================================== \nDocument Type: Purchase Order                Document No: PO-2026-0591 \nIssue Date: 2026-05-27                       Payment Terms: Net 30 Days \nRequested Delivery Date: 2026-06-02          Priority Status: Urgent \n------------------------------------------------------------------------ \n \nBUYER / CUSTOMER DETAILS: \nCompany Name: Shree Fab & Infrastructure \nDelivery Site: Project Site Warehouse, Sector 26, \n               Gandhinagar, Gujarat, India \nGSTIN: 24SFIFAB9876A1Z0 \n \nVENDOR / SUPPLIER DETAILS: \nCompany Name: Global Tools & Supplies \nDispatch Depot: 456 Commerce Boulevard, Sector 4, \n                Mumbai, Maharashtra, India \nGSTIN: 27GBLTS1234A1Z1 \nEmail: orders@globaltoolssupplies.com \n \n------------------------------------------------------------------------ \nLINE ITEMS \n------------------------------------------------------------------------ \n#   Item Code   Item Name & Description     Qty    Unit   Rate   Total \n------------------------------------------------------------------------ \n1   SB-402      Heavy-Duty Structural       150    Nos    420.00 63,000.00 \n                Steel Brackets \n                HSN Code: 7308.90 \n \n------------------------------------------------------------------------ \nFINANCIAL SUMMARY \n------------------------------------------------------------------------ \nSubtotal (Net Taxable Value):                          63,000.00 \nTaxes Applied: Integrated GST (IGST @ 18.0%):          11,340.00 \nFreight / Dispatch Charges:                                 0.00 \nRound Off Adjustment:                                       0.00 \n------------------------------------------------------------------------ \nGROSS TOTAL VALUE:                                     74,340.00 \n======================================================================== \nNotes: Dispatch MUST happen by coming Tuesday (2026-06-02) to avoid  \nassembly line production stoppage. Send a tentative delivery timeline  \nwith the draft transaction confirmation. \n========================================================================",
+    "extracted_data": {
+      "documentType": "Purchase Order",
+      "confidence": 98,
+      "vendor": {
+        "name": "Global Tools & Supplies",
+        "gstin": "27GBLTS1234A1Z1"
+      },
+      "customer": {
+        "name": "Shree Fab & Infrastructure",
+        "gstin": "24SFIFAB9876A1Z0"
+      },
+      "document": {
+        "documentNo": "PO-2026-0591",
+        "documentDate": "2026-05-27",
+        "dueDate": "2026-06-02",
+        "paymentTerms": "Net 30 Days",
+        "totalAmount": 74340.0,
+        "taxAmount": 11340.0,
+        "subtotal": 63000.0,
+        "discount": null,
+        "roundOff": 0.0
+      },
+      "lineItems": [
+        {
+          "itemName": "Heavy-Duty Structural Steel Brackets",
+          "itemCode": "SB-402",
+          "description": "Heavy-Duty Structural Steel Brackets",
+          "hsnSac": "7308.90",
+          "quantity": 150.0,
+          "unit": "Nos",
+          "rate": 420.0,
+          "discount": null,
+          "taxPercent": 18.0,
+          "taxAmount": 11340.0,
+          "lineTotal": 63000.0
+        }
+      ],
+      "missingFields": [
+        "document.discount",
+        "lineItems[0].discount"
+      ],
+      "warnings": [],
+      "requiresHumanReview": false
+    },
+    "timestamp": "2026-05-27 12:24:22"
+  },
+  {
+    "doc_id": 3,
+    "status": "Approved & Committed",
+    "raw_input_text": "======================================================================== \n                         COMMERCIAL INVOICE \n======================================================================== \nInvoice Number: #SUB-1024                    Invoice Date: 2026-05-27 \nPayment Condition: Bank Wire Transfer        Due Date: 2026-06-05 \n------------------------------------------------------------------------ \n \nVENDOR / SUPPLIER DETAILS: \nCompany Name: Nexus Automation \nBilling Team Desk, Operations Suite 4B \nEmail: accounts@nexusautomation.com \nGSTIN: [NOT PROVIDED] \n \nCUSTOMER / BUYER DETAILS: \nAttention: Sarah / Project Management Team \nProject Ref: Mobile Checkout Framework Integration \nEmail: sarah@clientorg.com \nGSTIN: [NOT PROVIDED] \n \n------------------------------------------------------------------------ \nLINE ITEMS \n------------------------------------------------------------------------ \n#   Item Code   Item Name & Description     Qty    Unit   Rate   Total \n------------------------------------------------------------------------ \n1   [NONE]      Data Integration Services   1      Job    2450.00 2450.00 \n                (Mobile Checkout Project) \n \n------------------------------------------------------------------------ \nFINANCIAL SUMMARY \n------------------------------------------------------------------------ \nSubtotal (Net Taxable Value):                          [NOT STATED] \nAggregated Taxes (GST / VAT):                               0.00 \nAbsolute Discounts Applied:                                 0.00 \nRound Off Fractional Adjustment:                            0.00 \n------------------------------------------------------------------------ \nTOTAL AMOUNT DUE & PAYABLE:                            2,450.00 USD \n======================================================================== \nNotes: Process payments safely using our standard direct deposit link  \nor bank routing coordinates listed on our primary ledger portal. \n========================================================================",
+    "extracted_data": {
+      "documentType": "Sales Invoice",
+      "confidence": 95,
+      "vendor": {
+        "name": "Nexus Automation",
+        "gstin": ""
+      },
+      "customer": {
+        "name": "clientorg.com",
+        "gstin": ""
+      },
+      "document": {
+        "documentNo": "#SUB-1024",
+        "documentDate": "2026-05-27",
+        "dueDate": "2026-06-05",
+        "paymentTerms": "Bank Wire Transfer",
+        "subtotal": 2450.0,
+        "taxAmount": 0.0,
+        "discount": 0.0,
+        "totalAmount": 2450.0,
+        "roundOff": 0.0
+      },
+      "lineItems": [
+        {
+          "itemName": "Data Integration Services",
+          "itemCode": null,
+          "description": "(Mobile Checkout Project)",
+          "hsnSac": null,
+          "quantity": 1.0,
+          "unit": "Job",
+          "rate": 2450.0,
+          "discount": null,
+          "taxPercent": null,
+          "taxAmount": 0.0,
+          "lineTotal": 2450.0
+        }
+      ],
+      "missingFields": [
+        "vendor.gstin",
+        "customer.gstin",
+        "lineItems[0].hsnSac",
+        "lineItems[0].taxPercent"
+      ],
+      "warnings": [
+        "Customer legal name derived from email domain as it was not explicitly stated.",
+        "Subtotal was explicitly marked as '[NOT STATED]' but was calculated from total, tax, discount, and round off."
+      ],
+      "requiresHumanReview": false
+    },
+    "timestamp": "2026-05-27 12:43:09"
   }
 ]

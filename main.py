@@ -1,11 +1,10 @@
 from fastapi import FastAPI, HTTPException
 import json
 import os
-import time  # 👑 FIX: Imported missing time module to prevent runtime crash
+import time  
 from app.services.gmail_listener import launch_listener_thread
 import app.services.gmail_listener as listener
 from app.models.document_models import DocumentExtractionOutput
-# 👑 FIX: Route directly through your isolated service layer
 from app.services.document_service import process_and_stage_document
 from pydantic import BaseModel
 import logging
@@ -49,9 +48,8 @@ def toggle_agent(action: dict):
         listener.is_agent_active = False
         return {"message": "Agent deactivated."}
 
-# =========================================================================
+
 # AGENT 1 ROUTES — EMAIL INTENT CLASSIFICATION LEDGER
-# =========================================================================
 
 @app.get("/drafts")
 def get_all_drafts():
@@ -88,9 +86,7 @@ def update_draft_status(payload: dict):
         
     return {"message": f"Draft state updated successfully to {new_status}."}
 
-# =========================================================================
 # AGENT 2 ROUTES — ATTACHMENT DOCUMENT DATA EXTRACTION LEDGER
-# =========================================================================
 
 @app.get("/document-drafts")
 def get_all_document_drafts():
