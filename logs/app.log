@@ -1,0 +1,105 @@
+2026-05-26 11:08:05 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 11:08:05 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 11:20:39 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 11:20:40 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 11:29:43 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 11:29:44 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 11:33:11 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 11:33:15 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 11:33:43 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 11:38:57 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 11:42:26 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 11:47:02 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 11:47:43 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 11:47:44 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 11:49:13 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 11:49:13 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:01:38 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:01:44 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:01:44 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:02:09 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:02:25 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:02:29 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:02:38 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:02:39 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:06:26 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:06:29 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:07:37 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:11:11 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:11:31 [INFO] Initializing Agent 2 Document Extraction Sequence.
+2026-05-26 12:11:37 [INFO] Successfully executed Agent 2 extraction. Type: Unknown | Confidence: 0%
+2026-05-26 12:15:30 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:16:07 [INFO] Initializing Agent 2 Document Extraction Sequence.
+2026-05-26 12:16:15 [INFO] Successfully executed Agent 2 extraction. Type: Unknown | Confidence: 0%
+2026-05-26 12:21:07 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:21:29 [INFO] Initializing Agent 2 Document Extraction Sequence.
+2026-05-26 12:21:36 [INFO] Successfully executed Agent 2 extraction. Type: Unknown | Confidence: 0%
+2026-05-26 12:27:47 [INFO] Initializing Agent 2 Document Extraction Sequence.
+2026-05-26 12:27:55 [INFO] Successfully executed Agent 2 extraction. Type: Purchase Invoice | Confidence: 95%
+2026-05-26 12:29:54 [INFO] Initializing Agent 2 Document Extraction Sequence.
+2026-05-26 12:30:04 [INFO] Successfully executed Agent 2 extraction. Type: Purchase Invoice | Confidence: 95%
+2026-05-26 12:37:52 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:39:06 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 12:39:19 [INFO] Initializing Agent 2 Document Extraction Sequence.
+2026-05-26 12:39:29 [INFO] Successfully executed Agent 2 extraction. Type: Sales Invoice | Confidence: 95%
+2026-05-26 12:46:48 [INFO] Initializing Agent 2 Document Extraction Sequence.
+2026-05-26 12:47:14 [INFO] Successfully executed Agent 2 extraction. Type: Quotation | Confidence: 95%
+2026-05-26 12:59:10 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 13:02:23 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 13:02:41 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 13:03:44 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 13:03:45 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 13:03:49 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 13:05:27 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 13:05:27 [INFO] Background listener system process spun up successfully. Awaiting dashboard connection activation hook.
+2026-05-26 13:09:04 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 13:09:04 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 13:09:04 [INFO] Background listener system process spun up successfully. Awaiting dashboard connection activation hook.
+2026-05-26 13:09:10 [INFO] Activation switch flip detected. Constructing production secure IMAP link with imap.gmail.com...
+2026-05-26 13:09:11 [INFO] IMAP Mailbox layer credential authentication verified. Inception loop active.
+2026-05-26 13:09:12 [INFO] Discovered 1 unread transaction emails inside target mailbox. Processing started.
+2026-05-26 13:09:13 [INFO] Initializing email processing workflow parameters for incoming message: 'Attachment of Purchase Order'
+2026-05-26 13:09:19 [INFO] Duplicate email found for tracking signature: 'Attachment of Purchase Order'. Processing skipped.
+2026-05-26 13:09:19 [INFO] Discovered matching PDF business file attachment: 'Cin7_Standard purchase order template.pdf'. Initiating parsing sequence.
+2026-05-26 13:09:19 [INFO] Successfully extracted 681 characters from email PDF attachment.
+2026-05-26 13:09:19 [INFO] Initializing Agent 2 Document Extraction Sequence.
+2026-05-26 13:09:34 [INFO] Successfully executed Agent 2 extraction. Type: Purchase Order | Confidence: 95%
+2026-05-26 13:09:34 [INFO] 🎯 Auto-Handoff Success! Attached file 'Cin7_Standard purchase order template.pdf' converted and posted to Agent 2 Ledger under Voucher ID #11
+2026-05-26 13:10:03 [INFO] Deactivation command intercepted. Terminating downstream mailbox loop networks safely.
+2026-05-26 13:22:45 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 13:22:45 [INFO] Background listener system process spun up successfully. Awaiting dashboard connection activation hook.
+2026-05-26 13:23:18 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-26 13:23:18 [INFO] Background listener system process spun up successfully. Awaiting dashboard connection activation hook.
+2026-05-26 13:24:24 [INFO] Activation switch flip detected. Constructing production secure IMAP link with imap.gmail.com...
+2026-05-26 13:24:30 [INFO] IMAP Mailbox layer credential authentication verified. Inception loop active.
+2026-05-26 13:24:32 [INFO] Discovered 1 unread transaction emails inside target mailbox. Processing started.
+2026-05-26 13:24:32 [INFO] Initializing email processing workflow parameters for incoming message: 'Attachment of Purchase Order'
+2026-05-26 13:24:55 [INFO] Duplicate email found for tracking signature: 'Attachment of Purchase Order'. Processing skipped.
+2026-05-26 13:24:55 [INFO] Discovered matching PDF business file attachment: 'Cin7_Standard purchase order template.pdf'. Initiating parsing sequence.
+2026-05-26 13:24:55 [INFO] Successfully extracted 681 characters from email PDF attachment.
+2026-05-26 13:24:55 [INFO] Initializing Agent 2 Document Extraction Sequence.
+2026-05-26 13:24:58 [WARNING] Gemini API 429 Rate Limit Exhausted. Commencing 20s cooldown phase. Attempt 1/3
+2026-05-26 13:25:19 [WARNING] Gemini API 429 Rate Limit Exhausted. Commencing 20s cooldown phase. Attempt 2/3
+2026-05-26 13:25:54 [INFO] Successfully executed Agent 2 extraction. Type: Purchase Order | Confidence: 88%
+2026-05-26 13:25:54 [INFO] 🎯 Auto-Handoff Success! Attached file 'Cin7_Standard purchase order template.pdf' converted and posted to Agent 2 Ledger under Voucher ID #12
+2026-05-26 13:27:36 [INFO] Deactivation command intercepted. Terminating downstream mailbox loop networks safely.
+2026-05-27 11:08:23 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-27 11:08:24 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-27 11:08:24 [INFO] Background listener system process spun up successfully. Awaiting dashboard connection activation hook.
+2026-05-27 11:08:44 [INFO] Activation switch flip detected. Constructing production secure IMAP link with imap.gmail.com...
+2026-05-27 11:08:45 [INFO] IMAP Mailbox layer credential authentication verified. Inception loop active.
+2026-05-27 11:08:46 [INFO] Discovered 1 unread transaction emails inside target mailbox. Processing started.
+2026-05-27 11:08:46 [INFO] Initializing email processing workflow parameters for incoming message: 'Attachment of Purchase Order'
+2026-05-27 11:14:15 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-27 11:14:16 [INFO] FastAPI Server Gateway Initialization Started.
+2026-05-27 11:14:16 [INFO] Background listener system process spun up successfully. Awaiting dashboard connection activation hook.
+2026-05-27 11:14:31 [INFO] Activation switch flip detected. Constructing production secure IMAP link with imap.gmail.com...
+2026-05-27 11:14:33 [INFO] IMAP Mailbox layer credential authentication verified. Inception loop active.
+2026-05-27 11:14:34 [INFO] Discovered 1 unread transaction emails inside target mailbox. Processing started.
+2026-05-27 11:14:35 [INFO] Initializing email processing workflow parameters for incoming message: 'Purchase Order for June Delivery - PO-2026-8894'
+2026-05-27 11:14:40 [INFO] Successfully committed Agent 1 pipeline results. Encapsulated Draft ID #1.
+2026-05-27 11:14:40 [INFO] Discovered matching PDF business file attachment: 'PO_ABC_Traders.pdf'. Initiating parsing sequence.
+2026-05-27 11:14:40 [INFO] Successfully extracted 2053 characters from email PDF attachment.
+2026-05-27 11:14:40 [INFO] Initializing Agent 2 Document Extraction Sequence.
+2026-05-27 11:14:50 [INFO] Successfully executed Agent 2 extraction. Type: Purchase Order | Confidence: 95%
+2026-05-27 11:14:50 [INFO] 🎯 Auto-Handoff Success! Attached file 'PO_ABC_Traders.pdf' converted and posted to Agent 2 Ledger under Voucher ID #1

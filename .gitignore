@@ -1,5 +1,5 @@
 
 .early.coverage
 .env
-
+__pycache__
 data/draft_ledger.json

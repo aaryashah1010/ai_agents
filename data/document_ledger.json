@@ -1,0 +1,74 @@
+[
+  {
+    "doc_id": 1,
+    "status": "Pending Review",
+    "raw_input_text": "======================================================================== \n                         PURCHASE ORDER \n======================================================================== \nPO Number: PO-2026-8894                      PO Date: 2026-05-26 \nPayment Terms: Net 30 Days                   Delivery Date: 2026-06-01 \n------------------------------------------------------------------------ \n \nFROM (BUYER): \nABC Traders Pvt Ltd \n102, Enterprise Way, Industrial Zone, \nGandhinagar, Gujarat, India \nGSTIN: 24ABCDE1234F1Z5 \nEmail: purchasing@abctraders.com \n \nTO (SUPPLIER): \nGlobal Tools & Supplies \n456 Commerce Boulevard, Sector 4, \nMumbai, Maharashtra, India \nGSTIN: [NOT PROVIDED] \n \n------------------------------------------------------------------------ \nLINE ITEMS \n------------------------------------------------------------------------ \n#   Item Name    Description            Qty    Unit   Rate    Total (INR) \n------------------------------------------------------------------------ \n1   Product A    Industrial Grade A     20     Box    500.00   10,000.00 \n2   Product B    Premium Component B    10     Box    800.00    8,000.00 \n \n------------------------------------------------------------------------ \nFINANCIAL SUMMARY \n------------------------------------------------------------------------ \nSubtotal:                                              18,000.00 \nDiscount (10% Special Promotional Rate):               -1,800.00 \nTaxable Value:                                         16,200.00 \nIGST (18% Flat Rate):                                   2,916.00 \nRound Off:                                                  0.00 \n------------------------------------------------------------------------ \nTOTAL AMOUNT DUE:                                      19,116.00 \n======================================================================== \nNotes: Please acknowledge receipt of this purchase order and confirm  \nthe delivery schedule via email response.  \n========================================================================",
+    "extracted_data": {
+      "documentType": "Purchase Order",
+      "confidence": 95,
+      "vendor": {
+        "name": "Global Tools & Supplies",
+        "gstin": null
+      },
+      "customer": {
+        "name": "ABC Traders Pvt Ltd",
+        "gstin": "24ABCDE1234F1Z5"
+      },
+      "document": {
+        "documentNo": "PO-2026-8894",
+        "documentDate": "2026-05-26",
+        "dueDate": "2026-06-25",
+        "paymentTerms": "Net 30 Days",
+        "totalAmount": 19116.0,
+        "taxAmount": 2916.0,
+        "subtotal": 18000.0,
+        "discount": 1800.0,
+        "roundOff": 0.0
+      },
+      "lineItems": [
+        {
+          "itemName": "Product A",
+          "itemCode": null,
+          "description": "Industrial Grade A",
+          "hsnSac": null,
+          "quantity": 20.0,
+          "unit": "Box",
+          "rate": 500.0,
+          "discount": null,
+          "taxPercent": null,
+          "taxAmount": 0.0,
+          "lineTotal": 10000.0
+        },
+        {
+          "itemName": "Product B",
+          "itemCode": null,
+          "description": "Premium Component B",
+          "hsnSac": null,
+          "quantity": 10.0,
+          "unit": "Box",
+          "rate": 800.0,
+          "discount": null,
+          "taxPercent": null,
+          "taxAmount": 0.0,
+          "lineTotal": 8000.0
+        }
+      ],
+      "missingFields": [
+        "vendor.gstin",
+        "itemCode",
+        "hsnSac",
+        "lineItems.discount",
+        "lineItems.taxPercent",
+        "lineItems.taxAmount"
+      ],
+      "warnings": [
+        "Vendor GSTIN was explicitly marked as 'NOT PROVIDED' in the document.",
+        "Due date was inferred from the document date and payment terms (Net 30 Days).",
+        "Line item specific tax percentages and amounts are not explicitly stated in the document.",
+        "Line item specific discounts are not explicitly stated in the document."
+      ],
+      "requiresHumanReview": true
+    },
+    "timestamp": "2026-05-27 11:14:50"
+  }
+]
