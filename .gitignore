@@ -3,3 +3,8 @@
 .env
 __pycache__
 data/draft_ledger.json
+data/document_ledger.json
+data/sample_documents.py
+
+logs/
+*.log
