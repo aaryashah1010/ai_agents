@@ -1,0 +1,146 @@
+[
+  {
+    "voice_id": 1,
+    "status": "Pending Review",
+    "raw_transcript_text": "Create a purchase order with vendor Acme Industries for 25 Pcs of Widget Max by next Monday\"",
+    "extracted_action_data": {
+      "intent": "Create Purchase Order",
+      "confidence": 95,
+      "partyType": "Vendor",
+      "customerName": null,
+      "vendorName": "Acme Industries",
+      "items": [
+        {
+          "itemName": "Widget Max",
+          "quantity": 25.0,
+          "unit": "Pcs"
+        }
+      ],
+      "discount": {
+        "type": null,
+        "value": 0.0
+      },
+      "deliveryDateText": "next Monday",
+      "paymentTerms": null,
+      "suggestedERPAction": "Open Purchase Order Form View",
+      "missingFields": [],
+      "warnings": [],
+      "confirmationRequired": true
+    },
+    "timestamp": "2026-05-28 13:14:16"
+  },
+  {
+    "voice_id": 2,
+    "status": "Pending Review",
+    "raw_transcript_text": "\"Hey, can we send a quotation to Crimson Logistics for 15 boxes of Heavy Duty Anchors? Give them a flat discount of 50 dollars, and let them know we can get it there by next Friday.\"",
+    "extracted_action_data": {
+      "intent": "Create Quotation",
+      "confidence": 98,
+      "partyType": "Customer",
+      "customerName": "Crimson Logistics",
+      "vendorName": null,
+      "items": [
+        {
+          "itemName": "Heavy Duty Anchors",
+          "quantity": 15.0,
+          "unit": "Box"
+        }
+      ],
+      "discount": {
+        "type": "Flat",
+        "value": 50.0
+      },
+      "deliveryDateText": "by next Friday",
+      "paymentTerms": null,
+      "suggestedERPAction": "Open Quotation Form With Prefilled Data",
+      "missingFields": [],
+      "warnings": [],
+      "confirmationRequired": true
+    },
+    "timestamp": "2026-05-28 13:15:53"
+  },
+  {
+    "voice_id": 3,
+    "status": "Pending Review",
+    "raw_transcript_text": "\"Go ahead and place an order for 250 units of Silicon Washers for TechCorp Industries. Payment terms are net 30 days.\"",
+    "extracted_action_data": {
+      "intent": "Create Sales Order",
+      "confidence": 95,
+      "partyType": "Customer",
+      "customerName": "TechCorp Industries",
+      "vendorName": null,
+      "items": [
+        {
+          "itemName": "Silicon Washers",
+          "quantity": 250.0,
+          "unit": "Unit"
+        }
+      ],
+      "discount": {
+        "type": null,
+        "value": 0.0
+      },
+      "deliveryDateText": null,
+      "paymentTerms": "net 30 days",
+      "suggestedERPAction": "Open Sales Order Template Screen",
+      "missingFields": [],
+      "warnings": [],
+      "confirmationRequired": true
+    },
+    "timestamp": "2026-05-28 13:17:27"
+  },
+  {
+    "voice_id": 4,
+    "status": "Pending Review",
+    "raw_transcript_text": "\"How much do they owe? Look up the outstanding account balance for Vanguard Group.\"",
+    "extracted_action_data": {
+      "intent": "Check Customer Balance",
+      "confidence": 95,
+      "partyType": "Customer",
+      "customerName": "Vanguard Group",
+      "vendorName": null,
+      "items": [],
+      "discount": {
+        "type": null,
+        "value": 0.0
+      },
+      "deliveryDateText": null,
+      "paymentTerms": null,
+      "suggestedERPAction": "Execute Customer Accounts Receivable Audit Search",
+      "missingFields": [],
+      "warnings": [],
+      "confirmationRequired": true
+    },
+    "timestamp": "2026-05-28 13:21:09"
+  },
+  {
+    "voice_id": 5,
+    "status": "Pending Review",
+    "raw_transcript_text": "Generate invoice for Global Retailers. They bought 500 Pcs of Eco Widgets. Apply a 10 percent discount.\"",
+    "extracted_action_data": {
+      "intent": "Create Invoice",
+      "confidence": 95,
+      "partyType": "Customer",
+      "customerName": "Global Retailers",
+      "vendorName": null,
+      "items": [
+        {
+          "itemName": "Eco Widgets",
+          "quantity": 500.0,
+          "unit": "Pcs"
+        }
+      ],
+      "discount": {
+        "type": "Percentage",
+        "value": 10.0
+      },
+      "deliveryDateText": null,
+      "paymentTerms": null,
+      "suggestedERPAction": "Open Billing Invoice Processing Window",
+      "missingFields": [],
+      "warnings": [],
+      "confirmationRequired": true
+    },
+    "timestamp": "2026-05-28 13:21:47"
+  }
+]
