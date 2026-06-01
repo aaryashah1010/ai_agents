@@ -1,5 +1,15 @@
+venv/
+
+.env
+
+__pycache__/
+
+logs/
+*.log
 
 .early.coverage
-.env
-__pycache__
-data/draft_ledger.json
+
+# OS files
+.DS_Store
+
+data/

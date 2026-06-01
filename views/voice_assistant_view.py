@@ -93,25 +93,27 @@ def render_voice_assistant():
         with col_telemetry:
             st.subheader("🖥️ Live Model Output Telemetry")
             if not selected_voice_record:
-                if "agent3_success_banner" in st.session_state and st.session_state["agent3_success_banner"]:
-                    st.success(st.session_state["agent3_success_banner"])
-                    st.session_state["agent3_success_banner"] = None
-                else:
-                    st.info("System standing by. Click 'Record' on the left, speak your instruction, and the parsed telemetry form values will draw here.")
+                st.info("System standing by. Awaiting valid input mapping controls.")
             else:
-                st.session_state["agent3_success_banner"] = None
                 action_data = selected_voice_record.get("extracted_action_data", {})
                 
-                st.metric(
-                    label=f"Identified Action Intent Target: {action_data.get('intent', 'Unknown')}",
-                    value=f"{action_data.get('confidence', 0)}% Model Confidence"
-                )
-                st.text_input("Suggested Target UI ERP Command Routing Link:", value=action_data.get("suggestedERPAction", ""), disabled=True)
-                
-                if action_data.get("missingFields"):
-                    st.error(f"⚠️ **Mandatory Missing Fields:** {', '.join(action_data['missingFields'])}")
-                if action_data.get("warnings"):
-                    st.warning(f"🛑 **Operational Warnings Logged:** {', '.join(action_data['warnings'])}")
+                # Check if the voucher was flagged as a processing error
+                if selected_voice_record.get("status") == "Failed Pre-Processing" or action_data.get("intent") == "Extraction Error":
+                    st.error("🛑 **Enterprise System Alert: Automated Transaction Processing Failed**")
+                    st.markdown("""
+                    This record has been intercepted by safety guardrails due to an internal system exception or unparseable input.
+                    - **Action Taken:** Saved safely to diagnostics ledger cache database.
+                    - **Notification:** Downstream technical alert dispatched automatically to IT administration infrastructure.
+                    """)
+                    st.info(f"📁 **Diagnostic Log Summary:** {', '.join(action_data.get('warnings', []))}")
+                else:
+                    # Render your normal metric widgets smoothly
+                    st.metric(
+                        label=f"Identified Action Intent Target: {action_data.get('intent', 'Unknown')}",
+                        value=f"{action_data.get('confidence', 0)}% Model Confidence"
+                    )
+                    st.text_input("Suggested Target UI ERP Command Routing Link:", value=action_data.get("suggestedERPAction", ""), disabled=True)
+
 
         # --- HUMAN CONFIRMATION FORM VIEW ---
         if selected_voice_record:
@@ -147,7 +149,7 @@ def render_voice_assistant():
             
             edited_items_list = st.data_editor(
                 action_data.get("items", []),
-                use_container_width=True,
+                width='stretch',
                 num_rows="dynamic",
                 key=f"data_grid_editor_v3_{selected_voice_record.get('voice_id', 'SIM')}"
             )
@@ -156,7 +158,7 @@ def render_voice_assistant():
             act_col1, act_col2 = st.columns(2)
             
             with act_col1:
-                if st.button("📥 Approve Prefilled Data & Launch Active ERP Transaction Window", type="primary", use_container_width=True):
+                if st.button("📥 Approve Prefilled Data & Launch Active ERP Transaction Window", type="primary", width='stretch'):
                     updated_compiled_dict = action_data.copy()
                     updated_compiled_dict["customerName"] = val_customer
                     updated_compiled_dict["vendorName"] = val_vendor
@@ -179,7 +181,7 @@ def render_voice_assistant():
                     st.rerun()
                     
             with act_col2:
-                if st.button("🗑️ Reject & Clear Intent Request", type="secondary", use_container_width=True):
+                if st.button("🗑️ Reject & Clear Intent Request", type="secondary", width='stretch'):
                     requests.post("http://127.0.0.1:8000/voice-drafts/action", json={
                         "voice_id": selected_voice_record["voice_id"],
                         "status": "Rejected & Voided",

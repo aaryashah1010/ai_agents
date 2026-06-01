@@ -1,9 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
-# =========================================================================
-# 1. INPUT SCHEMAL MODEL
-# =========================================================================
 class VoiceInputPayload(BaseModel):
     """
     Validates incoming voice transcriptions sent from the frontend dashboard.
@@ -14,9 +11,6 @@ class VoiceInputPayload(BaseModel):
     )
 
 
-# =========================================================================
-# 2. NESTED SUB-MODELS FOR COMPLEX ENTITIES
-# =========================================================================
 class VoiceItemRow(BaseModel):
     """
     Represents an item row extracted dynamically from conversational speech.
@@ -33,9 +27,6 @@ class DiscountDetail(BaseModel):
     value: Optional[float] = Field(None, description="The numeric value of the applied discount.")
 
 
-# =========================================================================
-# 3. CORE TARGET OUTPUT SCHEMA MODEL
-# =========================================================================
 class VoiceActionOutput(BaseModel):
     """
     The rigid target schema structure that Gemini must fill out deterministically.

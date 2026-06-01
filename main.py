@@ -10,14 +10,12 @@ from pydantic import BaseModel
 import logging
 from app.services.voice_service import process_and_stage_voice_command
 
-## INPUT MODEL FOR AGENT 2 ENDPOINT
 class DocumentInputPayload(BaseModel):
     raw_text: str
 
 class VoiceInputPayload(BaseModel):
     transcript: str
 
-# Establish centralized file logging configurations
 if not os.path.exists("logs"):
     os.makedirs("logs")
 
@@ -118,19 +116,15 @@ def process_document_extraction(payload: DocumentInputPayload):
     service layer, and commits the structured evaluation into the staging ledger database.
     """
     try:
-        # 1. Route the request through your isolated document service layer
         service_result = process_and_stage_document(payload.raw_text)
         
         if service_result["status"] == "error":
             raise HTTPException(status_code=400, detail=service_result["message"])
             
-        # Extract the verified core dictionary data object
         extracted_data_block = service_result["data"]
         
-        # 2. Ensure staging data storage file directory exists
         os.makedirs(os.path.dirname(DOC_LEDGER_PATH), exist_ok=True)
         
-        # 3. Load up existing data logs
         drafts = []
         if os.path.exists(DOC_LEDGER_PATH) and os.path.getsize(DOC_LEDGER_PATH) > 0:
             with open(DOC_LEDGER_PATH, "r", encoding="utf-8") as f:
@@ -139,10 +133,8 @@ def process_document_extraction(payload: DocumentInputPayload):
                 except:
                     drafts = []
                     
-        # 4. Generate an incremental index ID tracker
         next_id = max([d.get("doc_id", 0) for d in drafts]) + 1 if drafts else 1
         
-        # 5. Package the record into the database schema ledger frame
         draft_record = {
             "doc_id": next_id,
             "status": "Pending Review",
@@ -151,7 +143,6 @@ def process_document_extraction(payload: DocumentInputPayload):
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
         }
         
-        # Append and write back to storage cache ledger file
         drafts.append(draft_record)
         with open(DOC_LEDGER_PATH, "w", encoding="utf-8") as f:
             json.dump(drafts, f, indent=2)
@@ -222,7 +213,6 @@ def process_voice_action_endpoint(payload: VoiceInputPayload):
     and packages structured actions directly into the local verification staging ledger.
     """
     try:
-        # 1. Forward conversational transcript parameters down into your isolated service wrapper
         service_result = process_and_stage_voice_command(payload.transcript)
         
         if service_result["status"] == "error":
@@ -230,20 +220,16 @@ def process_voice_action_endpoint(payload: VoiceInputPayload):
             
         extracted_voice_block = service_result["data"]
         
-        # 2. Assert local staging file layout directories exist
         os.makedirs(os.path.dirname(VOICE_LEDGER_PATH), exist_ok=True)
         
-        # 3. Read active entries from local file storage cache database
         voice_records = []
         if os.path.exists(VOICE_LEDGER_PATH) and os.path.getsize(VOICE_LEDGER_PATH) > 0:
             with open(VOICE_LEDGER_PATH, "r", encoding="utf-8") as f:
                 try: voice_records = json.load(f)
                 except: voice_records = []
                     
-        # 4. Extrapolate an incremental voice index reference identification key
         next_voice_id = max([v.get("voice_id", 0) for v in voice_records]) + 1 if voice_records else 1
         
-        # 5. Build full Human-In-The-Loop tracking container envelope
         staged_record = {
             "voice_id": next_voice_id,
             "status": "Pending Review",
@@ -252,7 +238,6 @@ def process_voice_action_endpoint(payload: VoiceInputPayload):
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
         }
         
-        # Append and commit parameters back down to data file registry safely
         voice_records.append(staged_record)
         with open(VOICE_LEDGER_PATH, "w", encoding="utf-8") as f:
             json.dump(voice_records, f, indent=2)
