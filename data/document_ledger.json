@@ -56,14 +56,14 @@
   },
   {
     "doc_id": 4,
-    "status": "Pending Review",
+    "status": "Approved & Committed",
     "raw_input_text": "======================================================================== \n                         PURCHASE ORDER \n======================================================================== \nPO Number: PO-2026-8894                      PO Date: 2026-05-26 \nPayment Terms: Net 30 Days                   Delivery Date: 2026-06-01 \n------------------------------------------------------------------------ \n \nFROM (BUYER): \nABC Traders Pvt Ltd \n102, Enterprise Way, Industrial Zone, \nGandhinagar, Gujarat, India \nGSTIN: 24ABCDE1234F1Z5 \nEmail: purchasing@abctraders.com \n \nTO (SUPPLIER): \nGlobal Tools & Supplies \n456 Commerce Boulevard, Sector 4, \nMumbai, Maharashtra, India \nGSTIN: [NOT PROVIDED] \n \n------------------------------------------------------------------------ \nLINE ITEMS \n------------------------------------------------------------------------ \n#   Item Name    Description            Qty    Unit   Rate    Total (INR) \n------------------------------------------------------------------------ \n1   Product A    Industrial Grade A     20     Box    500.00   10,000.00 \n2   Product B    Premium Component B    10     Box    800.00    8,000.00 \n \n------------------------------------------------------------------------ \nFINANCIAL SUMMARY \n------------------------------------------------------------------------ \nSubtotal:                                              18,000.00 \nDiscount (10% Special Promotional Rate):               -1,800.00 \nTaxable Value:                                         16,200.00 \nIGST (18% Flat Rate):                                   2,916.00 \nRound Off:                                                  0.00 \n------------------------------------------------------------------------ \nTOTAL AMOUNT DUE:                                      19,116.00 \n======================================================================== \nNotes: Please acknowledge receipt of this purchase order and confirm  \nthe delivery schedule via email response.  \n========================================================================",
     "extracted_data": {
       "documentType": "Purchase Order",
       "confidence": 95,
       "vendor": {
         "name": "Global Tools & Supplies",
-        "gstin": null
+        "gstin": ""
       },
       "customer": {
         "name": "ABC Traders Pvt Ltd",
@@ -74,10 +74,10 @@
         "documentDate": "2026-05-26",
         "dueDate": "2026-06-25",
         "paymentTerms": "Net 30 Days",
-        "totalAmount": 19116.0,
-        "taxAmount": 2916.0,
         "subtotal": 18000.0,
+        "taxAmount": 2916.0,
         "discount": 1800.0,
+        "totalAmount": 19116.0,
         "roundOff": 0.0
       },
       "lineItems": [
@@ -119,7 +119,7 @@
         "Due date was derived from 'PO Date' and 'Payment Terms' as it was not explicitly stated as 'Due Date'.",
         "Line item specific tax percentages and amounts are not provided; only a document-level IGST is present."
       ],
-      "requiresHumanReview": true
+      "requiresHumanReview": false
     },
     "timestamp": "2026-05-29 15:48:23"
   },

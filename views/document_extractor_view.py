@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 def render_document_extractor():
-    st.title("📑 Agent 2 — Automated Document Data Extraction Engine")
+    st.title("📑 Agent 2 — Document Data Extraction Engine")
     st.caption("Purpose: Tracks and reviews structured schemas generated automatically from incoming email PDF attachments.")
     st.markdown("---")
     
@@ -26,7 +26,17 @@ def render_document_extractor():
             
             queue_options = []
             for d in pending_docs:
-                queue_options.append(f"📩 Live Email Attachment (Voucher #{d['doc_id']})")
+                # 👑 DYNAMIC NAME RESOLUTION HANDSHAKE
+                # 1. First choice: Use the live mailbox sender name captured by our listener
+                # 2. Second choice: Fallback to parsed structural identity strings
+                # 3. Final choice: Standard baseline label string
+                data_core = d.get("extracted_data", {})
+                vendor_name = data_core.get("vendor", {}).get("name")
+                customer_name = data_core.get("customer", {}).get("name")
+                
+                display_name = d.get("sender_name") or vendor_name or customer_name or "Unknown Sender"
+                
+                queue_options.append(f"📩 {display_name} (#{d['doc_id']})")
                 
             if not queue_options:
                 st.info("No new email attachments are currently awaiting extraction processing.")
@@ -39,6 +49,7 @@ def render_document_extractor():
                 )
             
             if selected_option and selected_option != "-- Choose an active document from queue --":
+                # Safely parse the trailing voucher voucher digit block out of the option layout string
                 target_id = int(selected_option.split("#")[-1].replace(")", ""))
                 selected_record = next(d for d in pending_docs if d["doc_id"] == target_id)
                 
@@ -71,7 +82,6 @@ def render_document_extractor():
                 st.markdown("##### 📌 Missing Core Parameters")
                 missing_list = data_core.get("missingFields", [])
                 if missing_list:
-                    
                     badge_markdown = " ".join([f"`⚠️ {field}`" for field in missing_list])
                     st.markdown(badge_markdown)
                 else:
@@ -87,7 +97,7 @@ def render_document_extractor():
             data_core = selected_record.get("extracted_data", {})
             doc_header = data_core.get("document", {})
             vendor_header = data_core.get("vendor", {})
-            customer_header = data_core.get("customer", {})  # Pulled for layout parity
+            customer_header = data_core.get("customer", {})
             
             st.markdown("#### 🔑 Core Identity Headers")
             m_col1, m_col2, m_col3, m_col4 = st.columns(4)
@@ -100,7 +110,6 @@ def render_document_extractor():
             with m_col4:
                 val_terms = st.text_input("Settlement Payment Terms", value=str(doc_header.get("paymentTerms") or ""), key="doc_trm_val")
                 
-            # Additional vendor and customer profiles
             c_col1, c_col2, c_col3, c_col4 = st.columns(4)
             with c_col1:
                 val_vendor = st.text_input("Vendor Entity Name", value=str(vendor_header.get("name") or ""), key="doc_vend_val")
@@ -130,7 +139,6 @@ def render_document_extractor():
                 except: total_val = 0.0
                 val_total = st.number_input("Gross Total Balance Payable", value=total_val, key="doc_tot_val")
 
-            # Remainder item metrics field
             st.caption("Adjustable Mathematical Rounding Corrections:")
             try: round_val = float(doc_header.get("roundOff") or 0.0)
             except: round_val = 0.0
