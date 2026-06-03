@@ -3,13 +3,14 @@ venv/
 .env
 
 __pycache__/
+*.pyc
 
 logs/
 *.log
 
 .early.coverage
 
-# OS files
 .DS_Store
 
 data/
+*.json

@@ -3,19 +3,24 @@ import requests
 import logging
 from app.models.document_models import DocumentExtractionOutput
 from app.agents.document_agent import extract_document_data
+from logging.handlers import RotatingFileHandler
 
-# Ensure tracking folders are ready
 if not os.path.exists("logs"):
     os.makedirs("logs")
 
 # Configure a clean separate logger interface for Agent 2
 doc_logger = logging.getLogger("document_agent_logger")
 if not doc_logger.handlers:
-    file_handler = logging.FileHandler("logs/document_processing.log")
+    file_handler = RotatingFileHandler(
+        "logs/document_processing.log", 
+        maxBytes=5 * 1024 * 1024, 
+        backupCount=3,
+        encoding="utf-8"
+    )
     formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
     file_handler.setFormatter(formatter)
     doc_logger.addHandler(file_handler)
-    doc_logger.setLevel(logging.INFO)
+    doc_logger.setLevel(logging.WARNING)
 
 def process_and_stage_document(raw_text_content: str) -> dict:
     """

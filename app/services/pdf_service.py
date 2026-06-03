@@ -2,7 +2,7 @@ import io
 import logging
 from pypdf import PdfReader
 
-logger = logging.getLogger("app.log")
+logger = logging.getLogger("document_agent_logger")
 
 def extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
     """

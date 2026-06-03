@@ -33,9 +33,18 @@ Evaluate the transcript string and map the "intent" and "suggestedERPAction" to 
   --> "intent": "Check Customer Balance"
   --> "suggestedERPAction": "Execute Customer Accounts Receivable Audit Search"
 
-### Mandatory Mandatory Validation Checks:
-- If a customerName or vendorName is required for the identified intent but is not stated in the transcript, you MUST append "partyName" to the "missingFields" tracking array list.
-- If an item name or product quantity is missing for transaction-based intents, you MUST append "items" to the "missingFields" tracking array list.
+### Strict Parameter Extraction Guidelines:
+1. PARTY EXTRACTION & TYPING:
+   - If the intent is "Create Quotation", "Create Sales Order", "Create Invoice", "Create Lead", or "Check Customer Balance": Set "partyType" to "Customer". Extract the corporate/person entity name explicitly into "customerName". Leave "vendorName" as null.
+   - If the intent is "Create Purchase Order": Set "partyType" to "Vendor". Extract the corporate/person entity name explicitly into "vendorName". Leave "customerName" as null.
+2. DISCOUNT EXTRACTION:
+   - Scan for phrases detailing deductions or reductions (e.g., "discount of 10%", "10 percent off", "minus 50 dollars").
+   - Populate the "discount" object. Set "type" to "Percentage" if a percent value is stated, or "Flat" if a cash value is stated. Parse the raw number into "value" as a clean float. Never include the percentage symbol (%) or currency marks in the value attribute.
+
+### Mandatory Validation Checks:
+- If customerName is required for the intent but missing, append "customerName" to the "missingFields" array.
+- If vendorName is required for the intent but missing, append "vendorName" to the "missingFields" array.
+- If any field required for the mapped intent (such as customerName, vendorName, partyType, itemName, quantity, or unit) is completely absent, unspecified, or unresolvable from the conversational text, append that exact missing JSON property string key name (such as customerName, vendorName, partyType, itemName, quantity, or unit) to the "missingFields" array.
 - Generate a model confidence score ranking from 0 to 100 based on how clear, complete, and explicit the verbal transaction request is.
 
 ### Mandatory Target JSON Output Blueprint:

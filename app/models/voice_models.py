@@ -1,10 +1,7 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
 
 class VoiceInputPayload(BaseModel):
-    """
-    Validates incoming voice transcriptions sent from the frontend dashboard.
-    """
     transcript: str = Field(
         ..., 
         description="The raw text transcription decoded from the user's verbal instruction."
@@ -12,25 +9,29 @@ class VoiceInputPayload(BaseModel):
 
 
 class VoiceItemRow(BaseModel):
-    """
-    Represents an item row extracted dynamically from conversational speech.
-    """
     itemName: str = Field(..., description="The name or description of the product or asset.")
-    quantity: float = Field(..., description="The numeric quantity requested.")
+    quantity: Optional[float] = Field(None, gt=0, description="The numeric quantity requested.")
     unit: Optional[str] = Field(None, description="The packaging unit like Box, Pcs, Kg, Liters.")
 
+    @field_validator('unit')
+    @classmethod
+    def standardize_units(cls, v: Optional[str]) -> Optional[str]:
+        if not v:
+            return v
+        mapping = {
+            "pcs": "Pcs", "pieces": "Pcs", "piece": "Pcs",
+            "box": "Box", "boxes": "Box",
+            "kg": "Kg", "kilograms": "Kg",
+            "units": "Unit", "unit": "Unit"
+        }
+        return mapping.get(v.lower(), v)
+
 class DiscountDetail(BaseModel):
-    """
-    Captures financial deductions explicitly mentioned in the voice stream.
-    """
     type: Optional[str] = Field(None, description="The type of deduction, e.g., Percentage or Flat.")
     value: Optional[float] = Field(None, description="The numeric value of the applied discount.")
 
 
 class VoiceActionOutput(BaseModel):
-    """
-    The rigid target schema structure that Gemini must fill out deterministically.
-    """
     intent: str = Field(..., description="The mapped core intention matching your supported action list.")
     confidence: int = Field(..., description="Model certainty metric score ranking from 0 to 100.")
     partyType: Optional[str] = Field(None, description="Classification of the external entity: Customer, Vendor, or null.")

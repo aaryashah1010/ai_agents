@@ -9,6 +9,7 @@ from app.services.document_service import process_and_stage_document
 from pydantic import BaseModel
 import logging
 from app.services.voice_service import process_and_stage_voice_command
+from logging.handlers import RotatingFileHandler
 
 class DocumentInputPayload(BaseModel):
     raw_text: str
@@ -19,13 +20,21 @@ class VoiceInputPayload(BaseModel):
 if not os.path.exists("logs"):
     os.makedirs("logs")
 
-logging.basicConfig(
-    filename="logs/app.log",                 
-    level=logging.INFO,                     
-    format="%(asctime)s [%(levelname)s] %(message)s",  
-    datefmt="%Y-%m-%d %H:%M:%S"
+rotating_app_handler = RotatingFileHandler(
+    "logs/app.log", 
+    maxBytes=5 * 1024 * 1024, 
+    backupCount=3,
+    encoding="utf-8"
 )
-logging.info("FastAPI Server Gateway Initialization Started.")
+rotating_app_handler.setFormatter(
+    logging.Formatter("%(asctime)s [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+)
+
+root_logger = logging.getLogger()
+root_logger.addHandler(rotating_app_handler)
+root_logger.setLevel(logging.WARNING)
+
+logging.warning("FastAPI Server Gateway Initialization Started under restricted logging controls.")
 
 app = FastAPI(title="Enterprise AI ERP Assistant Gateway")
 
@@ -69,6 +78,7 @@ def update_draft_status(payload: dict):
     """Updates a draft's status following a manual confirmation or rejection."""
     draft_id = payload.get("draft_id")
     new_status = payload.get("status") # e.g., "Approved & Committed" or "Rejected"
+    edited_data = payload.get("updated_data")
     
     if not os.path.exists(LEDGER_PATH):
         raise HTTPException(status_code=404, detail="Staging data file empty.")
@@ -80,6 +90,10 @@ def update_draft_status(payload: dict):
     for item in drafts:
         if item["draft_id"] == draft_id:
             item["status"] = new_status
+            if edited_data:
+                item["predicted_category"] = edited_data.get("category")
+                item["suggested_erp_action"] = edited_data.get("suggested_erp_action")
+                item["summary_draft"] = edited_data.get("summary_draft")
             updated = True
             break
             
@@ -110,7 +124,7 @@ def get_all_document_drafts():
         return []
 
 @app.post("/extract-document")
-def process_document_extraction(payload: DocumentInputPayload):
+def process_document_extraction(payload: DocumentInputPayload, filename: str = "Manual_Upload.pdf"):
     """
     Accepts raw unstructured document text strings, routes them through the isolated
     service layer, and commits the structured evaluation into the staging ledger database.
@@ -122,22 +136,20 @@ def process_document_extraction(payload: DocumentInputPayload):
             raise HTTPException(status_code=400, detail=service_result["message"])
             
         extracted_data_block = service_result["data"]
-        
         os.makedirs(os.path.dirname(DOC_LEDGER_PATH), exist_ok=True)
         
         drafts = []
         if os.path.exists(DOC_LEDGER_PATH) and os.path.getsize(DOC_LEDGER_PATH) > 0:
             with open(DOC_LEDGER_PATH, "r", encoding="utf-8") as f:
-                try:
-                    drafts = json.load(f)
-                except:
-                    drafts = []
+                try: drafts = json.load(f)
+                except: drafts = []
                     
         next_id = max([d.get("doc_id", 0) for d in drafts]) + 1 if drafts else 1
         
         draft_record = {
             "doc_id": next_id,
             "status": "Pending Review",
+            "filename": filename,
             "raw_input_text": payload.raw_text,
             "extracted_data": extracted_data_block,
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
@@ -158,7 +170,7 @@ def process_document_extraction(payload: DocumentInputPayload):
     except Exception as e:
         logging.error(f"Global backend breakdown inside document parser router: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Document agent extraction failure: {str(e)}")
-
+    
 @app.post("/document-drafts/action")
 def update_document_draft_status(payload: dict):
     """Updates a document draft status following manual review validation processing updates."""

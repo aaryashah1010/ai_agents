@@ -11,6 +11,7 @@ from app.agents.email_agent import classify_email
 from app.services.pdf_service import extract_text_from_pdf_bytes
 from app.services.document_service import process_and_stage_document
 import logging
+from logging.handlers import RotatingFileHandler
 
 load_dotenv()
 
@@ -18,8 +19,19 @@ is_agent_active = False
 LEDGER_PATH = "data/draft_ledger.json"
 DOC_LEDGER_PATH = "data/document_ledger.json"
 
-# Capture unified application logging configuration
-logger = logging.getLogger("app.log")
+email_logger = logging.getLogger("email_agent_logger")
+if not email_logger.handlers:
+    file_handler = RotatingFileHandler(
+        "logs/email_processing.log", 
+        maxBytes=5 * 1024 * 1024, 
+        backupCount=3,
+        encoding="utf-8"
+    )
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+    file_handler.setFormatter(formatter)
+    email_logger.addHandler(file_handler)
+
+    email_logger.setLevel(logging.WARNING)
 
 def save_to_draft_ledger(email_data: EmailInput, agent_output):
     """Appends the classified record into a draft staging document cache."""
@@ -31,13 +43,16 @@ def save_to_draft_ledger(email_data: EmailInput, agent_output):
             with open(LEDGER_PATH, "r") as f:
                 drafts = json.load(f)
         except Exception as err:
-            logger.warning(f"Failed to parse draft ledger data file: {err}. Starting with fresh structure.")
+            email_logger.warning(f"Failed to parse draft ledger data file: {err}. Starting with fresh structure.")
             drafts = []
 
     if any(d.get("subject") == email_data.subject and d.get("sender_email") == email_data.fromEmail for d in drafts):
         print(f"[SYSTEM] Email '{email_data.subject}' already staged. Skipping duplicate.")
-        logger.info(f"Duplicate email found for tracking signature: '{email_data.subject}'. Processing skipped.")
+        email_logger.info(f"Duplicate email found for tracking signature: '{email_data.subject}'. Processing skipped.")
         return
+
+    has_attachments = len(email_data.attachmentNames) > 0
+    attachment_processing_flag = "Yes" if has_attachments else "No"
 
     next_id = max([d.get("draft_id", 0) for d in drafts]) + 1 if drafts else 1
 
@@ -49,6 +64,7 @@ def save_to_draft_ledger(email_data: EmailInput, agent_output):
         "subject": email_data.subject,
         "body": email_data.body,
         "attachments": email_data.attachmentNames,
+        "attachment_processing_required": attachment_processing_flag,
         "predicted_category": agent_output.category,
         "confidence": agent_output.confidence,
         "suggested_erp_action": agent_output.suggestedERPAction,
@@ -61,13 +77,13 @@ def save_to_draft_ledger(email_data: EmailInput, agent_output):
     with open(LEDGER_PATH, "w") as f:
         json.dump(drafts, f, indent=2)
     print(f"[LEDGER] Saved live email as Draft ID #{next_id} (Status: Pending Review).")
-    logger.info(f"Successfully committed Agent 1 pipeline results. Encapsulated Draft ID #{next_id}.")
+    email_logger.info(f"Successfully committed Agent 1 pipeline results. Encapsulated Draft ID #{next_id}.")
 
 def parse_and_process_email(mail, message_id):
     try:
         status, data = mail.fetch(message_id, "(RFC822)")
         if status != "OK" or not data[0]:
-            logger.warning(f"Failed to fetch raw message body text for Message ID: {message_id}")
+            email_logger.warning(f"Failed to fetch raw message body text for Message ID: {message_id}")
             return
 
         raw_email = data[0][1]
@@ -122,20 +138,20 @@ def parse_and_process_email(mail, message_id):
         )
         
         print(f"\n[LIVE EVENT] Processing incoming mail: {live_payload.subject}")
-        logger.info(f"Initializing email processing workflow parameters for incoming message: '{live_payload.subject}'")
+        email_logger.info(f"Initializing email processing workflow parameters for incoming message: '{live_payload.subject}'")
         
         output = classify_email(live_payload)
         save_to_draft_ledger(live_payload, output)
         
         # --- NEW FEATURE: EXECUTE AUTOMATED PIPELINE HANDOFF TO AGENT 2 ---
         for filename, file_bytes in pdf_attachments_payloads:
-            logger.info(f"Discovered matching PDF business file attachment: '{filename}'. Initiating parsing sequence.")
+            email_logger.info(f"Discovered matching PDF business file attachment: '{filename}'. Initiating parsing sequence.")
             
             # 1. Convert PDF input streams to unstructured text arrays
             extracted_pdf_text = extract_text_from_pdf_bytes(file_bytes)
             
             if not extracted_pdf_text.strip():
-                logger.warning(f"Aborting auto-handoff loop profile for '{filename}': Text conversion result empty.")
+                email_logger.warning(f"Aborting auto-handoff loop profile for '{filename}': Text conversion result empty.")
                 continue
                 
             # 2. Forward converted text structure directly to Agent 2 service core wrapper
@@ -159,6 +175,7 @@ def parse_and_process_email(mail, message_id):
                 doc_record = {
                     "doc_id": next_doc_id,
                     "status": "Pending Review",
+                    "filename": filename,
                     "raw_input_text": extracted_pdf_text,
                     "extracted_data": extracted_dict_data,
                     "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
@@ -168,15 +185,15 @@ def parse_and_process_email(mail, message_id):
                 with open(DOC_LEDGER_PATH, "w", encoding="utf-8") as f:
                     json.dump(doc_drafts, f, indent=2)
                     
-                logger.info(f"🎯 Auto-Handoff Success! Attached file '{filename}' converted and posted to Agent 2 Ledger under Voucher ID #{next_doc_id}")
+                email_logger.info(f"🎯 Auto-Handoff Success! Attached file '{filename}' converted and posted to Agent 2 Ledger under Voucher ID #{next_doc_id}")
             else:
-                logger.error(f"Agent 2 extraction pipeline failed during automatic attachment ingestion: {service_result.get('message')}")
+                email_logger.error(f"Agent 2 extraction pipeline failed during automatic attachment ingestion: {service_result.get('message')}")
 
         mail.store(message_id, "+FLAGS", "\\Seen")
 
     except Exception as e:
         print(f"[ERROR IN LIVE AGENT PARSER]: {e}")
-        logger.error(f"Fatal processing exception raised within message processing framework loops: {str(e)}")
+        email_logger.error(f"Fatal processing exception raised within message processing framework loops: {str(e)}")
 
 def start_live_gmail_listener():
     global is_agent_active
@@ -184,7 +201,7 @@ def start_live_gmail_listener():
     password = os.getenv("GMAIL_APP_PASSWORD")
     
     print("[SYSTEM] Background thread initialized. Standing by for activation signal...")
-    logger.info("Background listener system process spun up successfully. Awaiting dashboard connection activation hook.")
+    email_logger.info("Background listener system process spun up successfully. Awaiting dashboard connection activation hook.")
     
     while True:
         if not is_agent_active:
@@ -193,11 +210,11 @@ def start_live_gmail_listener():
             
         try:
             print("[SYSTEM] Activation signal received! Connecting to Gmail server...")
-            logger.info("Activation switch flip detected. Constructing production secure IMAP link with imap.gmail.com...")
+            email_logger.info("Activation switch flip detected. Constructing production secure IMAP link with imap.gmail.com...")
             mail = imaplib.IMAP4_SSL("imap.gmail.com")
             mail.login(username, password)
             print("[SYSTEM] Authentication successful. Monitoring inbox for UNSEEN mail...")
-            logger.info("IMAP Mailbox layer credential authentication verified. Inception loop active.")
+            email_logger.info("IMAP Mailbox layer credential authentication verified. Inception loop active.")
             
             while is_agent_active:
                 mail.select("inbox")
@@ -207,7 +224,7 @@ def start_live_gmail_listener():
                 
                 if status == "OK" and messages[0]:
                     email_ids = messages[0].split()
-                    logger.info(f"Discovered {len(email_ids)} unread transaction emails inside target mailbox. Processing started.")
+                    email_logger.info(f"Discovered {len(email_ids)} unread transaction emails inside target mailbox. Processing started.")
                     for msg_id in email_ids:
                         if not is_agent_active:
                             break
@@ -216,12 +233,12 @@ def start_live_gmail_listener():
                 time.sleep(5)
                 
             print("[SYSTEM] Agent deactivated by user switch. Closing mailbox link...")
-            logger.info("Deactivation command intercepted. Terminating downstream mailbox loop networks safely.")
+            email_logger.info("Deactivation command intercepted. Terminating downstream mailbox loop networks safely.")
             mail.logout()
             
         except Exception as e:
             print(f"[SYSTEM EXCEPTION] Error in mail stream loop: {e}")
-            logger.error(f"Uncaught background runtime error raised in core polling worker sequence: {str(e)}")
+            email_logger.error(f"Uncaught background runtime error raised in core polling worker sequence: {str(e)}")
             time.sleep(5)
             
 def launch_listener_thread():
