@@ -3,7 +3,7 @@ import requests
 from app.services.pdf_service import extract_text_from_pdf_bytes
 
 def render_document_extractor():
-    st.title("📑 Agent 2 — Automated Document Data Extraction Engine")
+    st.title("📑 Agent 2 — Document Data Extraction Engine")
     st.caption("Purpose: Tracks and reviews structured schemas generated automatically from incoming email PDF attachments.")
     st.markdown("---")
     
@@ -24,14 +24,22 @@ def render_document_extractor():
     with col_queue:
         st.subheader("📥 Live Ingested Attachment Queue")
         
-        # 🟢 FIX #1: Read the filename parameter natively to build cleaner labels
+        # 👑 MAIN BRANCH LOGIC ACCEPTED: Dynamic Name Resolution Handshake
         queue_options = []
         for d in pending_docs:
-            fname = d.get("filename", f"Voucher #{d['doc_id']}")
-            queue_options.append(f"📄 {fname} (Ref #{d['doc_id']})")
+            data_core = d.get("extracted_data", {}) or {}
+            vendor_name = data_core.get("vendor", {}).get("name")
+            customer_name = data_core.get("customer", {}).get("name")
+            
+            # 1. First choice: Use the live mailbox sender name captured by our listener
+            # 2. Second choice: Fallback to parsed structural identity strings
+            # 3. Final choice: Standard baseline label string
+            display_name = d.get("sender_name") or vendor_name or customer_name or "Unknown Sender"
+            
+            queue_options.append(f"📩 {display_name} (#{d['doc_id']})")
             
         if not queue_options:
-            st.info("No new attachments are currently awaiting extraction processing.")
+            st.info("No new email attachments are currently awaiting extraction processing.")
             selected_option = None
         else:
             selected_option = st.selectbox(
@@ -41,19 +49,20 @@ def render_document_extractor():
             )
         
         if selected_option and selected_option != "-- Choose an active document from queue --":
-            target_id = int(selected_option.split("Ref #")[-1].replace(")", ""))
+            # Safely parse the trailing voucher digit block out of the option layout string
+            target_id = int(selected_option.split("#")[-1].replace(")", ""))
             selected_record = next(d for d in pending_docs if d["doc_id"] == target_id)
             
-            st.info(f"⏳ **Origin Matrix:** Source verified. Parsing active data frame...")
+            st.info(f"⏳ **Origin:** Intercepted background email PDF attachment. Loaded into memory.")
             st.text_area(
                 "Extracted Raw Document Text Block:", 
                 value=selected_record.get("raw_input_text", ""), 
-                height=180, 
+                height=220, 
                 disabled=True,
                 key=f"raw_view_{target_id}"
             )
             
-        # 🟢 FIX #2: Manual Local PDF Uploader Form Interface Widget
+        #LOCAL MANUAL UPLOAD FEATURE 
         st.markdown("<br>", unsafe_allow_html=True)
         with st.expander("📤 Local Manual System Upload Fallback", expanded=False):
             st.markdown("Manually upload a business document PDF here to parse it through Agent 2:")
@@ -63,14 +72,12 @@ def render_document_extractor():
                 if st.button("🚀 Process & Inject Uploaded Document", type="secondary", use_container_width=True):
                     with st.spinner("Extracting PDF bytes and executing AI extraction..."):
                         try:
-                            # 1. Reuse your production pypdf extractor logic safely
                             file_bytes = uploaded_file.read()
                             extracted_text = extract_text_from_pdf_bytes(file_bytes)
                             
                             if not extracted_text.strip():
                                 st.error("Could not extract any structural text parameters from this PDF file.")
                             else:
-                                # 2. Package data payload and dispatch to endpoint
                                 response = requests.post(
                                     f"http://127.0.0.1:8000/extract-document?filename={uploaded_file.name}",
                                     json={"raw_text": extracted_text}
@@ -111,7 +118,7 @@ def render_document_extractor():
             if data_core.get("warnings"):
                 st.error(f"🛑 **Model Warnings:** {', '.join(data_core['warnings'])}")
 
-    # Human-in-the-loop verification form setup logic continues below completely safely
+    # Human-in-the-loop verification form setup logic runs safely with dynamic tracking IDs
     if selected_record:
         st.markdown("---")
         st.subheader(f"🛠️ Human-in-the-Loop Validation Workspace — Audit Entry Voucher #{selected_record.get('doc_id')}")

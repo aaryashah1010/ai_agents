@@ -176,6 +176,7 @@ def parse_and_process_email(mail, message_id):
                     "doc_id": next_doc_id,
                     "status": "Pending Review",
                     "filename": filename,
+                    "sender_name": live_payload.fromName,
                     "raw_input_text": extracted_pdf_text,
                     "extracted_data": extracted_dict_data,
                     "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
