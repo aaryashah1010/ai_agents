@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "voice_id": 1,
+    "status": "Pending Review",
+    "raw_transcript_text": "create a quotation for xyz for 10 boxes of products in the discount of 10%",
+    "extracted_action_data": {
+      "intent": "Create Quotation",
+      "confidence": 95,
+      "partyType": "Customer",
+      "customerName": "xyz",
+      "vendorName": null,
+      "items": [
+        {
+          "itemName": "products",
+          "quantity": 10.0,
+          "unit": "Box"
+        }
+      ],
+      "discount": {
+        "type": "Percentage",
+        "value": 10.0
+      },
+      "deliveryDateText": null,
+      "paymentTerms": null,
+      "suggestedERPAction": "Open Quotation Form With Prefilled Data",
+      "missingFields": [],
+      "warnings": [],
+      "confirmationRequired": true
+    },
+    "timestamp": "2026-06-12 18:08:37"
+  }
+]

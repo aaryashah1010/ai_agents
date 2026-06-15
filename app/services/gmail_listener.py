@@ -12,6 +12,7 @@ from app.services.pdf_service import extract_text_from_pdf_bytes
 from app.services.document_service import process_and_stage_document
 import logging
 from logging.handlers import RotatingFileHandler
+from app.services.config_service import load_email_config
 
 load_dotenv()
 
@@ -198,11 +199,9 @@ def parse_and_process_email(mail, message_id):
 
 def start_live_gmail_listener():
     global is_agent_active
-    username = os.getenv("GMAIL_USER")
-    password = os.getenv("GMAIL_APP_PASSWORD")
     
     print("[SYSTEM] Background thread initialized. Standing by for activation signal...")
-    email_logger.info("Background listener system process spun up successfully. Awaiting dashboard connection activation hook.")
+    email_logger.info("Background listener system process spun up successfully. Awaiting dashboard activation hook.")
     
     while True:
         if not is_agent_active:
@@ -210,22 +209,49 @@ def start_live_gmail_listener():
             continue
             
         try:
-            print("[SYSTEM] Activation signal received! Connecting to Gmail server...")
-            email_logger.info("Activation switch flip detected. Constructing production secure IMAP link with imap.gmail.com...")
-            mail = imaplib.IMAP4_SSL("imap.gmail.com")
+            # --- DYNAMIC RE-READ PHASE ---
+            # Fetch fresh structural values straight from the JSON file on cycle startup
+            config = load_email_config()
+            active_email = config.get("active_email")
+            
+            if not active_email or active_email not in config.get("profiles", {}):
+                print("[SYSTEM WARNING] Listener active but no valid target profile selected!")
+                email_logger.warning("Mailbox monitoring loop halted: Missing active user profile.")
+                time.sleep(10)
+                continue
+                
+            active_profile = config["profiles"][active_email]
+            
+            username = active_email
+            password = active_profile.get("app_password")
+            imap_server = active_profile.get("imap_server", "imap.gmail.com")
+            port = active_profile.get("port", 993)
+            
+            if not username or not password:
+                print("[SYSTEM WARNING] Listener active but Email Credentials are unconfigured or empty!")
+                email_logger.warning("Mailbox monitoring loop halted: Missing valid user profile credentials inside JSON storage.")
+                time.sleep(10)
+                continue
+
+            print(f"[SYSTEM] Activation signal received! Connecting to {imap_server}:{port}...")
+            email_logger.info(f"Establishing custom IMAP connection pipeline hook with {imap_server}...")
+            
+            # Establish standard/custom secure IMAP socket mapping arrays
+            mail = imaplib.IMAP4_SSL(imap_server, port=port)
             mail.login(username, password)
-            print("[SYSTEM] Authentication successful. Monitoring inbox for UNSEEN mail...")
-            email_logger.info("IMAP Mailbox layer credential authentication verified. Inception loop active.")
+            
+            print(f"[SYSTEM] Authentication successful. Monitoring inbox '{username}' for UNSEEN mail...")
+            email_logger.info(f"IMAP connection for {username} verified successfully. Listener intercept array active.")
             
             while is_agent_active:
                 mail.select("inbox")
                 status, messages = mail.search(None, "UNSEEN")
                 
-                print(f"[LIVE CHECK] Inbox scan status: {status} | Unread data packet: {messages[0]}")
+                print(f"[LIVE CHECK] Scan status for {username}: {status} | Packet payload: {messages[0]}")
                 
                 if status == "OK" and messages[0]:
                     email_ids = messages[0].split()
-                    email_logger.info(f"Discovered {len(email_ids)} unread transaction emails inside target mailbox. Processing started.")
+                    email_logger.info(f"Discovered {len(email_ids)} unread transaction emails. Processing started.")
                     for msg_id in email_ids:
                         if not is_agent_active:
                             break

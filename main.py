@@ -6,16 +6,24 @@ from app.services.gmail_listener import launch_listener_thread
 import app.services.gmail_listener as listener
 from app.models.document_models import DocumentExtractionOutput
 from app.services.document_service import process_and_stage_document
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import logging
 from app.services.voice_service import process_and_stage_voice_command
 from logging.handlers import RotatingFileHandler
+from app.services.config_service import load_email_config, save_email_config
+from app.routes import email_routes
 
 class DocumentInputPayload(BaseModel):
     raw_text: str
 
 class VoiceInputPayload(BaseModel):
     transcript: str
+
+class EmailConfigSchema(BaseModel):
+    email: str = Field(..., description="Target IMAP Email Address")
+    app_password: str = Field(..., description="16-character secure Google App Password")
+    imap_server: str = Field(default="imap.gmail.com", description="IMAP server hostname")
+    port: int = Field(default=993, description="Secure SSL port")
 
 if not os.path.exists("logs"):
     os.makedirs("logs")
@@ -42,6 +50,34 @@ LEDGER_PATH = "data/draft_ledger.json"
 DOC_LEDGER_PATH = "data/document_ledger.json"
 VOICE_LEDGER_PATH = "data/voice_ledger.json"
 
+## ⚙️ AGENT SYSTEM CONFIGURATION ROUTES (Mounted directly on app)
+
+@app.get("/get-email-settings")
+def get_email_settings_endpoint():
+    """Reads current system routing parameters safely out of data/email_configs.json."""
+    try:
+        return load_email_config()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/save-email-settings")
+def save_email_settings_endpoint(payload: EmailConfigSchema):
+    """Commits fresh custom client IMAP routing parameters into data/email_configs.json."""
+    try:
+        config_dict = {
+            "email": payload.email,
+            "app_password": payload.app_password,
+            "imap_server": payload.imap_server,
+            "port": payload.port
+        }
+        success = save_email_config(config_dict)
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to write configuration variables onto disk layer.")
+            
+        return {"status": "success", "message": "Email infrastructure configuration successfully committed."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
 ## AGENT CONTROL ROUTES — START/STOP AND STATUS CHECKS
 
 @app.on_event("startup")
