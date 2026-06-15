@@ -128,6 +128,18 @@ def render_document_extractor():
         doc_header = data_core.get("document", {})
         vendor_header = data_core.get("vendor", {})
         customer_header = data_core.get("customer", {}) 
+
+        # --- NEW SECTION: Email Origin Metadata ---
+        st.markdown("#### 📧 Email Origin Metadata")
+        e_col1, e_col2, e_col3 = st.columns(3)
+        with e_col1:
+            st.text_input("From (Sender)", value=selected_record.get("from_email") or "Unknown / Manual Upload", disabled=True, key=f"email_from_{target_uid}")
+        with e_col2:
+            st.text_input("To (Recipient)", value=selected_record.get("to_email") or "Unknown / Manual Upload", disabled=True, key=f"email_to_{target_uid}")
+        with e_col3:
+            st.text_input("Subject", value=selected_record.get("subject") or "No Subject Available", disabled=True, key=f"email_sub_{target_uid}")
+        st.markdown("<br>", unsafe_allow_html=True)
+        # ----------------------------------------
         
         st.markdown("#### 🔑 Core Identity Headers")
         m_col1, m_col2, m_col3, m_col4 = st.columns(4)

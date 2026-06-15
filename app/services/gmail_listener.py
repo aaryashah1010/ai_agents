@@ -97,6 +97,14 @@ def parse_and_process_email(mail, message_id):
         from_sender, encoding = decode_header(msg["From"])[0]
         if isinstance(from_sender, bytes):
             from_sender = from_sender.decode(encoding if encoding else "utf-8", errors="ignore")
+
+        to_receiver = "Unknown"
+        if msg.get("To"):
+            to_header_raw, to_encoding = decode_header(msg["To"])[0]
+            if isinstance(to_header_raw, bytes):
+                to_receiver = to_header_raw.decode(to_encoding if to_encoding else "utf-8", errors="ignore")
+            else:
+                to_receiver = str(to_header_raw)
             
         body = ""
         attachment_names = []
@@ -178,6 +186,9 @@ def parse_and_process_email(mail, message_id):
                     "status": "Pending Review",
                     "filename": filename,
                     "sender_name": live_payload.fromName,
+                    "from_email": live_payload.fromEmail,
+                    "to_email": to_receiver,
+                    "subject": live_payload.subject,
                     "raw_input_text": extracted_pdf_text,
                     "extracted_data": extracted_dict_data,
                     "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")

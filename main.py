@@ -15,6 +15,9 @@ from app.routes import email_routes
 
 class DocumentInputPayload(BaseModel):
     raw_text: str
+    from_email: str | None = None
+    to_email: str | None = None
+    subject: str | None = None
 
 class VoiceInputPayload(BaseModel):
     transcript: str
@@ -186,6 +189,9 @@ def process_document_extraction(payload: DocumentInputPayload, filename: str = "
             "doc_id": next_id,
             "status": "Pending Review",
             "filename": filename,
+            "from_email": payload.from_email,
+            "to_email": payload.to_email,
+            "subject": payload.subject,
             "raw_input_text": payload.raw_text,
             "extracted_data": extracted_data_block,
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
