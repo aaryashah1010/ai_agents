@@ -4,8 +4,8 @@ import time
 from streamlit_mic_recorder import speech_to_text
 
 def render_voice_assistant():
-    st.title("🗣️ Agent 3 — Voice-to-ERP Action Agent")
-    st.caption("Purpose: Decodes conversational user transcripts, extracts transactional parameters, and maps downstream ERP routing intents.")
+    st.title("🗣️ Agent 3 — Voice to ERP Action Agent")
+    st.caption("Talk to your ERP: Record a command to automatically generate sales orders, quotes, or check stock.")
     st.markdown("---")
 
     @st.fragment(run_every="3s")
@@ -24,11 +24,10 @@ def render_voice_assistant():
         pending_voices = [v for v in all_voice_drafts if v.get("status") == "Pending Review"]
         processed_voices = [v for v in all_voice_drafts if v.get("status") != "Pending Review"]
         
-        # live autio ingestion and immediate telemetry screen panels
         col_input, col_telemetry = st.columns([1, 1])
         
         with col_input:
-            st.subheader("🎙️ Live Voice Input Capture")
+            st.markdown("### **🎙️ Record a Command**")
             st.markdown("Click the record button below, speak your command clearly, and then click it again to parse:")
 
             if "last_processed_live_speech" not in st.session_state:
@@ -48,7 +47,7 @@ def render_voice_assistant():
             st.markdown("<br>", unsafe_allow_html=True)
             
             fallback_text_input = st.text_input(
-                "⌨️ Hardware Fallback — Type spoken instruction here if mic is blocked:",
+                "⌨️ Type your instruction here if your mic is blocked:",
                 placeholder="Example: Create a quote for ABC Traders for 10 boxes of Product A.",
                 key="voice_fallback_text_field"
             )
@@ -67,7 +66,6 @@ def render_voice_assistant():
                                 json={"transcript": clean_speech_text}
                             )
                             if res.status_code == 200:
-                                # Instantly force selection view focus onto this freshly recorded item
                                 new_record = res.json()["voice_data"]
                                 st.session_state["active_live_voice_payload"] = new_record
                                 st.session_state["last_processed_live_speech"] = clean_speech_text
@@ -88,19 +86,20 @@ def render_voice_assistant():
                 </div>
                 """, unsafe_allow_html=True)
 
-        queue_options = ["-- Choose an active voucher draft to process --"]
+        queue_options = ["-- Choose an active voice draft to process --"]
         
         if st.session_state.get("active_live_voice_payload"):
             queue_options.append("✨ LIVE-VR-DRAFT | Newly Captured Action")
             
         for v in pending_voices:
-            ts_part = v.get("timestamp", "0000-00-00 00:00:00").split()[0].replace("-", "")
-            queue_options.append(f"📄 AUDIT-VR-{ts_part}-{v['voice_id']:02d} | Pending Review")
+            action_data = v.get("extracted_action_data", {})
+            intent_name = action_data.get("intent", "Unknown Intent")
+            v_id = v.get("voice_id", 0)
+            
+            queue_options.append(f"📄 {intent_name} (ID: {v_id})")
 
-        #queue of ingested commands
         st.markdown("<br><hr>", unsafe_allow_html=True)
-        st.subheader("📥 Queue of Ingested Spoken Commands")
-        st.markdown("Select an ingested voice voucher record from ledger cache to display audit form:")
+        st.markdown("### **📥 Pending Voice Actions**")
         
         default_index = 0
         if st.session_state.get("active_live_voice_payload"):
@@ -121,13 +120,15 @@ def render_voice_assistant():
                 selected_voice_record = st.session_state.get("active_live_voice_payload")
             else:
                 try:
-                    parsed_id = int(selected_option.split("-")[-1].split()[0])
+                    id_string = selected_option.split("(ID: ")[1].split(")")[0]
+                    parsed_id = int(id_string)
                     selected_voice_record = next(v for v in pending_voices if v["voice_id"] == parsed_id)
-                except:
+                except Exception as e:
                     selected_voice_record = None
 
         with col_telemetry:
-            st.subheader("🖥️ Live Model Output Telemetry")
+            st.markdown("### **🖥️ AI Interpretation**")
+            
             if not selected_voice_record:
                 if "agent3_success_banner" in st.session_state and st.session_state["agent3_success_banner"]:
                     st.success(st.session_state["agent3_success_banner"])
@@ -139,15 +140,18 @@ def render_voice_assistant():
                 action_data = selected_voice_record.get("extracted_action_data", {})
                 
                 st.metric(
-                    label=f"Identified Action Intent Target: {action_data.get('intent', 'Unknown')}",
-                    value=f"{action_data.get('confidence', 0)}% Model Confidence"
+                    label=f"Action Detected: {action_data.get('intent', 'Unknown')}",
+                    value=f"{action_data.get('confidence', 0)}% Confidence"
                 )
-                st.text_input("Suggested Target ERP Action:", value=action_data.get("suggestedERPAction", ""), disabled=True)
+                st.text_input("Suggested Next Step:", value=action_data.get("suggestedERPAction", ""), disabled=True)
                 
-                if action_data.get("missingFields"):
-                    st.error(f"⚠️ **Mandatory Missing Fields:** {', '.join(action_data['missingFields'])}")
+                missing_fields = action_data.get("missingFields", [])
+                if missing_fields:
+                    st.error(f"🛑 **Cannot Proceed — Missing Data:** {', '.join(missing_fields)}")
+                    st.info("💡 **How to fix:** Please click 'Record' again and restate your command including the missing information.")
+                
                 if action_data.get("warnings"):
-                    st.warning(f"🛑 **Operational Warnings Logged:** {', '.join(action_data['warnings'])}")
+                    st.warning(f"⚠️ **Notices:** {', '.join(action_data['warnings'])}")
 
         if selected_voice_record:
             st.info("Loaded transcript profile summary block:")
@@ -159,82 +163,102 @@ def render_voice_assistant():
                 key=f"text_area_preview_{selected_voice_record.get('voice_id')}"
             )
 
-        # human review and confirmation workspace for the selected record
         if selected_voice_record:
             st.markdown("---")
-            st.subheader(f"🛠️ Human Review & Confirmation Workspace — Entry Ref #{selected_voice_record.get('voice_id', 'SIM')}")
+            st.markdown(f"### **🛠️ Review & Approve Details — ID #{selected_voice_record.get('voice_id', 'SIM')}**")
             
             action_data = selected_voice_record.get("extracted_action_data", {})
             discount_node = action_data.get("discount", {}) or {}
             
             record_uid = str(selected_voice_record.get('voice_id', 'SIM'))
 
-            st.markdown("#### 🔑 Identity & Parameter Headers")
-            h_col1, h_col2, h_col3, h_col4 = st.columns(4)
-            with h_col1:
-                val_customer = st.text_input(
-                    "Customer Name Reference", 
-                    value=str(action_data.get("customerName") or ""), 
-                    key=f"v3_cust_name_{record_uid}"
-                )
-            with h_col2:
-                val_vendor = st.text_input(
-                    "Vendor Name Reference", 
-                    value=str(action_data.get("vendorName") or ""), 
-                    key=f"v3_vend_name_{record_uid}"
-                )
-            with h_col3:
-                val_party_type = st.text_input(
-                    "Evaluated Entity Party Type", 
-                    value=str(action_data.get("partyType") or ""), 
-                    key=f"v3_party_type_{record_uid}"
-                )
-            with h_col4:
-                val_delivery_date = st.text_input(
-                    "Preserved Delivery Deadline Text", 
-                    value=str(action_data.get("deliveryDateText") or ""), 
-                    key=f"v3_del_text_{record_uid}"
-                )
+            st.markdown("<br><b>🔑 Basic Details</b>", unsafe_allow_html=True)
+            
+            val_customer = action_data.get("customerName") or ""
+            val_vendor = action_data.get("vendorName") or ""
+            val_contact = action_data.get("contactInfo") or ""
+            val_party_type = action_data.get("partyType") or ""
+            val_delivery_date = action_data.get("deliveryDateText") or ""
+            
+            intent_type = action_data.get("intent", "")
+            
+            show_cust = intent_type in ["Create Quotation", "Create Sales Order", "Create Invoice", "Create Lead", "Check Customer Balance"] or bool(val_customer)
+            show_vend = intent_type in ["Create Purchase Order"] or bool(val_vendor)
+            show_contact = intent_type in ["Create Lead"] or bool(val_contact)
+            show_party = bool(val_party_type)
+            show_delivery = bool(val_delivery_date)
+            
+            active_fields = []
+            if show_cust: active_fields.append("cust")
+            if show_vend: active_fields.append("vend")
+            if show_contact: active_fields.append("contact")
+            if show_party: active_fields.append("party")
+            if show_delivery: active_fields.append("delivery")
+            
+            if active_fields:
+                cols = st.columns(len(active_fields))
+                col_idx = 0
                 
+                if show_cust:
+                    with cols[col_idx]:
+                        val_customer = st.text_input("Customer Name", value=str(val_customer), key=f"v3_cust_name_{record_uid}")
+                    col_idx += 1
+                if show_vend:
+                    with cols[col_idx]:
+                        val_vendor = st.text_input("Vendor Name", value=str(val_vendor), key=f"v3_vend_name_{record_uid}")
+                    col_idx += 1
+                if show_contact:
+                    with cols[col_idx]:
+                        val_contact = st.text_input("Contact Info", value=str(val_contact), key=f"v3_contact_{record_uid}")
+                    col_idx += 1
+                if show_party:
+                    with cols[col_idx]:
+                        val_party_type = st.text_input("Party Type", value=str(val_party_type), key=f"v3_party_type_{record_uid}")
+                    col_idx += 1
+                if show_delivery:
+                    with cols[col_idx]:
+                        val_delivery_date = st.text_input("Delivery Date", value=str(val_delivery_date), key=f"v3_del_text_{record_uid}")
+                    col_idx += 1
+
             p_col1, p_col2, p_col3 = st.columns([1, 1, 2])
             with p_col1:
-                val_disc_type = st.text_input(
-                    "Pricing Deduction Type", 
-                    value=str(discount_node.get("type") or "None"), 
-                    key=f"v3_disc_type_{record_uid}" 
-                )
+                val_disc_type = st.text_input("Discount Type", value=str(discount_node.get("type") or "None"), key=f"v3_disc_type_{record_uid}")
             with p_col2:
                 try: 
                     disc_amt = float(discount_node.get("value") or 0.0)
                 except: 
                     disc_amt = 0.0
-                val_disc_val = st.number_input(
-                    "Applied Deduction Value Metric", 
-                    value=disc_amt, 
-                    key=f"v3_disc_val_{record_uid}" 
-                )
+                val_disc_val = st.number_input("Discount Amount", value=disc_amt, key=f"v3_disc_val_{record_uid}")
             with p_col3:
-                val_p_terms = st.text_input(
-                    "Extracted Standard Settlement Payment Terms", 
-                    value=str(action_data.get("paymentTerms") or "None"), 
-                    key=f"v3_p_terms_{record_uid}" 
-                )
-
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown("#### 📦 Item Line Parameter Matrix Grid")
+                val_p_terms = st.text_input("Payment Terms", value=str(action_data.get("paymentTerms") or ""), key=f"v3_p_terms_{record_uid}")
+                
+            st.markdown("<br><b>📦 Items & Pricing</b>", unsafe_allow_html=True)
             
+            raw_items = action_data.get("items", [])
+            for item in raw_items:
+                if "rate" not in item or item["rate"] is None:
+                    item["rate"] = 0.0
+
             edited_items_list = st.data_editor(
-                action_data.get("items", []),
+                raw_items,
                 width='stretch',
                 num_rows="dynamic",
+                column_config={
+                    "itemName": st.column_config.TextColumn("Item Name", required=True),
+                    "quantity": st.column_config.NumberColumn("Quantity", min_value=0),
+                    "unit": st.column_config.TextColumn("Unit"),
+                    "rate": st.column_config.NumberColumn("Price / Rate", min_value=0.0, format="%.2f")
+                },
                 key=f"data_grid_editor_v3_{selected_voice_record.get('voice_id', 'SIM')}"
             )
             
             st.markdown("<br>", unsafe_allow_html=True)
             act_col1, act_col2 = st.columns(2)
             
+            is_blocked = len(action_data.get("missingFields", [])) > 0
+            
             with act_col1:
-                if st.button("📥 Approve Prefilled Data & Launch Active ERP Transaction Window", type="primary", width='stretch'):
+                if st.button("📥 Approve & Proceed", type="primary", width='stretch', disabled=is_blocked):
                     updated_compiled_dict = action_data.copy()
                     updated_compiled_dict["customerName"] = val_customer
                     updated_compiled_dict["vendorName"] = val_vendor
@@ -243,6 +267,7 @@ def render_voice_assistant():
                     updated_compiled_dict["paymentTerms"] = val_p_terms
                     updated_compiled_dict["discount"] = {"type": val_disc_type, "value": val_disc_val}
                     updated_compiled_dict["items"] = edited_items_list
+                    updated_compiled_dict["contactInfo"] = val_contact
                     updated_compiled_dict["confirmationRequired"] = False
                     
                     requests.post("http://127.0.0.1:8000/voice-drafts/action", json={
@@ -251,29 +276,27 @@ def render_voice_assistant():
                         "updated_data": updated_compiled_dict
                     })
                     
-                    st.session_state["agent3_success_banner"] = f"🟢 Voice Voucher #{selected_voice_record['voice_id']} successfully routed and prefilled into accounting form layout!"
+                    st.session_state["agent3_success_banner"] = f"🟢 Voice Command #{selected_voice_record['voice_id']} successfully approved!"
                     st.session_state["active_live_voice_payload"] = None
                     st.session_state["last_processed_live_speech"] = None
                     st.rerun()
                     
             with act_col2:
-                if st.button("🗑️ Reject & Clear Intent Request", type="secondary", width='stretch'):
+                if st.button("🗑️ Delete Request", type="secondary", width='stretch'):
                     requests.post("http://127.0.0.1:8000/voice-drafts/action", json={
                         "voice_id": selected_voice_record["voice_id"],
                         "status": "Rejected & Voided",
                         "updated_data": None
                     })
                     
-                    st.session_state["agent3_success_banner"] = f"🗑️ Voice Command Entry Ref #{selected_voice_record['voice_id']} canceled."
+                    st.session_state["agent3_success_banner"] = f"🗑️ Request #{selected_voice_record['voice_id']} deleted."
                     st.session_state["active_live_voice_payload"] = None
                     st.session_state["last_processed_live_speech"] = None
                     st.rerun()
 
-        # historical logs
         if processed_voices:
             st.markdown("---")
-            st.subheader("📜 Historical Processing Log")
-            st.markdown("Review records that have already gone through human validation triage.")
+            st.markdown("### **📜 Historical Processing Log**")
             
             formatted_history = []
             for item in processed_voices:

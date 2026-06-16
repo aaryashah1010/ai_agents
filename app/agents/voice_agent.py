@@ -55,4 +55,20 @@ def extract_voice_action_data(raw_transcript: str) -> VoiceActionOutput:
         if vendor_match:
             recovered_data["vendorName"] = vendor_match.group(1)
             
+        contact_match = re.search(r'"contactInfo"\s*:\s*"([^"]+)"', cleaned_response)
+        if contact_match:
+            recovered_data["contactInfo"] = contact_match.group(1)
+         
+        missing_fields_match = re.search(r'"missingFields"\s*:\s*\[(.*?)\]', cleaned_response, re.DOTALL)
+        if missing_fields_match:
+            raw_array_str = missing_fields_match.group(1)
+            # Find all string values inside quotes within the bracket block
+            found_fields = re.findall(r'"([^"]+)"', raw_array_str)
+            if found_fields:
+                recovered_data["missingFields"] = found_fields
+        
+        # If we still didn't find missing fields, append a standard warning
+        if not recovered_data["missingFields"]:
+            recovered_data["missingFields"] = ["JSON Transcript Parse Failure Recovery Active"]
+            
         return VoiceActionOutput(**recovered_data)

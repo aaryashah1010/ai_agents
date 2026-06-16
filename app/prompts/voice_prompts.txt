@@ -33,44 +33,54 @@ Evaluate the transcript string and map the "intent" and "suggestedERPAction" to 
   --> "intent": "Check Customer Balance"
   --> "suggestedERPAction": "Execute Customer Accounts Receivable Audit Search"
 
-### Strict Parameter Extraction Guidelines:
-1. PARTY EXTRACTION & TYPING:
-   - If the intent is "Create Quotation", "Create Sales Order", "Create Invoice", "Create Lead", or "Check Customer Balance": Set "partyType" to "Customer". Extract the corporate/person entity name explicitly into "customerName". Leave "vendorName" as null.
-   - If the intent is "Create Purchase Order": Set "partyType" to "Vendor". Extract the corporate/person entity name explicitly into "vendorName". Leave "customerName" as null.
-2. DISCOUNT EXTRACTION:
-   - Scan for phrases detailing deductions or reductions (e.g., "discount of 10%", "10 percent off", "minus 50 dollars").
-   - Populate the "discount" object. Set "type" to "Percentage" if a percent value is stated, or "Flat" if a cash value is stated. Parse the raw number into "value" as a clean float. Never include the percentage symbol (%) or currency marks in the value attribute.
+### Strict Parameter Extraction & Validation Guidelines:
+You are enforcing strict ERP business logic. If a user requests an action but fails to provide the required data for that action, you MUST flag it.
 
-### Mandatory Validation Checks:
-- If customerName is required for the intent but missing, append "customerName" to the "missingFields" array.
-- If vendorName is required for the intent but missing, append "vendorName" to the "missingFields" array.
-- If any field required for the mapped intent (such as customerName, vendorName, partyType, itemName, quantity, or unit) is completely absent, unspecified, or unresolvable from the conversational text, append that exact missing JSON property string key name (such as customerName, vendorName, partyType, itemName, quantity, or unit) to the "missingFields" array.
-- Generate a model confidence score ranking from 0 to 100 based on how clear, complete, and explicit the verbal transaction request is.
+1. INTENT REQUIREMENT MAPPING:
+   - "Create Quotation" REQUIRES: customerName, itemName, quantity, rate.
+   - "Create Sales Order" REQUIRES: customerName, itemName, quantity.
+   - "Create Purchase Order" REQUIRES: vendorName, itemName, quantity.
+   - "Create Invoice" REQUIRES: customerName, itemName, quantity, rate.
+   - "Create Lead" REQUIRES: customerName (used for lead name), contactInfo (phone/email).
+   - "Check Stock" REQUIRES: itemName.
+   - "Check Customer Balance" REQUIRES: customerName.
+
+2. MISSING FIELDS LOGIC:
+   - Evaluate the spoken text against the requirements mapping above.
+   - If ANY required field is missing from the spoken text, do NOT invent it.
+   - Append the exact JSON key name of the missing piece of data (e.g., "rate", "customerName", "contactInfo", "quantity", "itemName") into the "missingFields" array.
+   - If an intent requires items, but no items are spoken, add "itemName" and "quantity" to missingFields.
+
+3. RATE & CONTACT EXTRACTION:
+   - If a user dictates a price (e.g., "for 50 dollars each", "priced at 200"), extract this cleanly as a float into the "rate" property inside the items array.
+   - If a user dictates contact info (e.g., "phone number is 555-0192", "email is john@test.com"), extract it into "contactInfo".
 
 ### Mandatory Target JSON Output Blueprint:
 Your final text response output must conform perfectly to this exact layout template:
 {
-  "intent": "Mappped Voice Intent String Name",
+  "intent": "Mapped Voice Intent String Name",
   "confidence": 90,
-  "partyType": "Customer, Vendor, or null based on intent type context",
+  "partyType": "Customer, Vendor, or null",
   "customerName": "Name string of buying party or null",
   "vendorName": "Name string of selling party or null",
+  "contactInfo": "Phone or email string or null",
   "items": [
     {
       "itemName": "Product name string",
       "quantity": 1.0,
-      "unit": "Singular capitalized unit name string like Box, Pcs, Kg, Unit, or null"
+      "unit": "Singular capitalized unit name string like Box, Pcs, Kg, Unit, or null",
+      "rate": 50.0 
     }
   ],
   "discount": {
     "type": "Percentage, Flat, or null",
     "value": 0.0
   },
-  "deliveryDateText": "Preserved literal spoken relative timeframe string or null",
+  "deliveryDateText": "Preserved literal spoken timeframe string or null",
   "paymentTerms": "Spoken payment rules or null",
-  "suggestedERPAction": "Mapped action form command route string layout",
-  "missingFields": [],
-  "warnings": [],
+  "suggestedERPAction": "Mapped action form command route",
+  "missingFields": ["contactInfo", "rate"], 
+  "warnings": ["Pricing missing from quotation request."],
   "confirmationRequired": true
 }
 

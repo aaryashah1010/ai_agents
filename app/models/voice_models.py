@@ -12,7 +12,8 @@ class VoiceItemRow(BaseModel):
     itemName: str = Field(..., description="The name or description of the product or asset.")
     quantity: Optional[float] = Field(None, gt=0, description="The numeric quantity requested.")
     unit: Optional[str] = Field(None, description="The packaging unit like Box, Pcs, Kg, Liters.")
-
+    rate: Optional[float] = Field(None, description="The stated unit price or total item cost.")
+        
     @field_validator('unit')
     @classmethod
     def standardize_units(cls, v: Optional[str]) -> Optional[str]:
@@ -37,6 +38,7 @@ class VoiceActionOutput(BaseModel):
     partyType: Optional[str] = Field(None, description="Classification of the external entity: Customer, Vendor, or null.")
     customerName: Optional[str] = Field(None, description="The identified name of the customer party, or null.")
     vendorName: Optional[str] = Field(None, description="The identified name of the vendor party, or null.")
+    contactInfo: Optional[str] = Field(None, description="Extracted phone number, email address, or contact details.")
     
     # Nested item matrix list row structure
     items: List[VoiceItemRow] = Field(default_factory=list, description="A structured list array of extracted item line profiles.")
