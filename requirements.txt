@@ -2,7 +2,7 @@ fastapi
 uvicorn
 pydantic
 streamlit
-google-genai
+google-generativeai
 pypdf
 requests
 python-dotenv
