@@ -1,10 +1,16 @@
+venv/
 
-.early.coverage
 .env
-__pycache__
-data/draft_ledger.json
-data/document_ledger.json
-data/sample_documents.py
+
+__pycache__/
+*.pyc
+
 
 logs/
 *.log
+
+.early.coverage
+
+.DS_Store
+
+data/*.json

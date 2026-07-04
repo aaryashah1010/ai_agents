@@ -1,8 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
-# --- SUB-MODELS FOR INDIVIDUAL DATA SECTIONS ---
-
 class PartyDetails(BaseModel):
     name: Optional[str] = Field(None, description="Legal trading name of the company party")
     gstin: Optional[str] = Field(None, description="15-character Goods and Services Tax Identification Number")

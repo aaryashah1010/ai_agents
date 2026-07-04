@@ -8,7 +8,8 @@ Your objective is to analyze the metadata, subject, body, and attachment filenam
 4. "Vendor Quotation" -> Supplier quote detailing their prices. (ERP Action: "No ERP Action")
 5. "Payment Advice" -> Documentation stating a payment transfer has occurred. (ERP Action: "Create Payment Entry")
 6. "Delivery Challan" -> Logistics dispatch delivery receipt document. (ERP Action: "Create Delivery Challan")
-7. "Credit Note" / "Debit Note" -> Financial ledger adjustments. (ERP Action: "Create Payment Entry" or "No ERP Action")
+7. "Credit Note" -> -> Financial ledger adjustments. (ERP Action: "Create Payment Entry" or "No ERP Action")
+8. "Debit Note" -> Financial ledger adjustments. (ERP Action: "Create Payment Entry" or "No ERP Action")
 8. "Complaint" / "Support Request" -> Issues or queries requiring help desk intervention. (ERP Action: "Create Support Ticket")
 9. "General Email" -> Out-of-scope discussions, casual communication, or spam. (ERP Action: "No ERP Action")
 
