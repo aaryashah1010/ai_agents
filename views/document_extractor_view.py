@@ -1,6 +1,9 @@
+import os
 import streamlit as st
 import requests
 from app.services.pdf_service import extract_text_from_pdf_bytes
+
+BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
 
 def render_document_extractor():
     st.title("📑 Agent 2 — Document Data Extraction Engine")
@@ -10,7 +13,7 @@ def render_document_extractor():
     # Fetch all active records from backend staging cache
     all_doc_drafts = []
     try:
-        all_doc_drafts = requests.get("http://127.0.0.1:8000/document-drafts").json()
+        all_doc_drafts = requests.get(f"{BACKEND_URL}/document-drafts").json()
     except:
         st.error("Could not fetch current document records from backend.")
         return
@@ -72,7 +75,7 @@ def render_document_extractor():
                                 st.error("Could not extract any text from this PDF.")
                             else:
                                 response = requests.post(
-                                    f"http://127.0.0.1:8000/extract-document?filename={uploaded_file.name}",
+                                    f"{BACKEND_URL}/extract-document?filename={uploaded_file.name}",
                                     json={"raw_text": extracted_text}
                                 )
                                 if response.status_code == 200:
@@ -200,7 +203,7 @@ def render_document_extractor():
                 compiled_human_data["lineItems"] = edited_line_items
                 compiled_human_data["requiresHumanReview"] = False
                 
-                requests.post("http://127.0.0.1:8000/document-drafts/action", json={
+                requests.post(f"{BACKEND_URL}/document-drafts/action", json={
                     "doc_id": selected_record["doc_id"], "status": "Approved & Committed", "updated_data": compiled_human_data
                 })
                 st.session_state["agent2_commit_alert"] = f"🟢 Document #{selected_record['doc_id']} approved and saved."
@@ -208,7 +211,7 @@ def render_document_extractor():
                 
         with act_col2:
             if st.button("🗑️ Delete", type="secondary", width="stretch"):
-                requests.post("http://127.0.0.1:8000/document-drafts/action", json={
+                requests.post(f"{BACKEND_URL}/document-drafts/action", json={
                     "doc_id": selected_record["doc_id"], "status": "Rejected & Voided", "updated_data": None
                 })
                 st.session_state["agent2_commit_alert"] = f"🗑️ Document #{selected_record['doc_id']} deleted."
@@ -217,7 +220,7 @@ def render_document_extractor():
     @st.fragment(run_every="3s")
     def attachment_loop_watcher():
         try:
-            live_check = requests.get("http://127.0.0.1:8000/document-drafts").json()
+            live_check = requests.get(f"{BACKEND_URL}/document-drafts").json()
             active_p_count = len([d for d in live_check if d.get("status") == "Pending Review"])
             if active_p_count != len(pending_docs):
                 st.rerun()

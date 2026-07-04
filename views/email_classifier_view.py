@@ -1,6 +1,9 @@
 from time import time
+import os
 import streamlit as st
 import requests
+
+BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
 
 def render_email_classifier():
     st.title("📧 Agent 1 — Email Classification Agent")
@@ -14,8 +17,8 @@ def render_email_classifier():
     current_config = {"email": "", "app_password": "", "imap_server": "imap.gmail.com", "port": 993}
     
     try:
-        current_status = requests.get("http://127.0.0.1:8000/agent-status").json().get("status", "inactive")
-        res_data = requests.get("http://127.0.0.1:8000/get-email-settings").json()
+        current_status = requests.get(f"{BACKEND_URL}/agent-status").json().get("status", "inactive")
+        res_data = requests.get(f"{BACKEND_URL}/get-email-settings").json()
         
         if isinstance(res_data, dict):
             current_config = res_data
@@ -78,7 +81,7 @@ def render_email_classifier():
                     "port": int(ui_port)
                 }
                 try:
-                    res = requests.post("http://127.0.0.1:8000/save-email-settings", json=payload)
+                    res = requests.post(f"{BACKEND_URL}/save-email-settings", json=payload)
                     if res.status_code == 200:
                         st.toast(f"Profile '{ui_email}' activated!", icon="💾")
                         st.rerun()
@@ -93,11 +96,11 @@ def render_email_classifier():
     btn_col1, btn_col2, _ = st.columns([1, 1, 4])
     with btn_col1:
         if st.button("▶️ Start Agent", type="primary", width="stretch", disabled=(current_status == "active" or current_status == "Disconnected")):
-            requests.post("http://127.0.0.1:8000/agent-toggle", json={"command": "start"})
+            requests.post(f"{BACKEND_URL}/agent-toggle", json={"command": "start"})
             st.rerun()
     with btn_col2:
         if st.button("⏹️ Stop Agent", type="secondary", width="stretch", disabled=(current_status == "inactive" or current_status == "Disconnected")):
-            requests.post("http://127.0.0.1:8000/agent-toggle", json={"command": "stop"})
+            requests.post(f"{BACKEND_URL}/agent-toggle", json={"command": "stop"})
             st.rerun()
 
     st.markdown("---")
@@ -105,7 +108,7 @@ def render_email_classifier():
     # 1. FETCH ALL DRAFT DATA
     all_drafts = []
     try:
-        all_drafts = requests.get("http://127.0.0.1:8000/drafts").json()
+        all_drafts = requests.get(f"{BACKEND_URL}/drafts").json()
     except:
         st.error("Could not fetch current records from backend.")
         return
@@ -214,7 +217,7 @@ def render_email_classifier():
                             "suggested_erp_action": edited_action,
                             "summary_draft": edited_summary
                         }
-                        requests.post("http://127.0.0.1:8000/drafts/action", json={
+                        requests.post(f"{BACKEND_URL}/drafts/action", json={
                             "draft_id": target_id, 
                             "status": "Approved & Committed",
                             "updated_data": updated_payload
@@ -224,7 +227,7 @@ def render_email_classifier():
                         
                 with act_col2:
                     if st.button("🗑️ Delete Request", type="secondary", width="stretch", key=f"rej_btn_{target_id}"):
-                        requests.post("http://127.0.0.1:8000/drafts/action", json={
+                        requests.post(f"{BACKEND_URL}/drafts/action", json={
                             "draft_id": target_id, 
                             "status": "Rejected",
                             "updated_data": None

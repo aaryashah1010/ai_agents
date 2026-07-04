@@ -1,7 +1,10 @@
+import os
 import streamlit as st
 import requests
 import time
 from streamlit_mic_recorder import speech_to_text
+
+BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
 
 def render_voice_assistant():
     st.title("🗣️ Agent 3 — Voice to ERP Action Agent")
@@ -16,7 +19,7 @@ def render_voice_assistant():
 
         all_voice_drafts = []
         try:
-            all_voice_drafts = requests.get("http://127.0.0.1:8000/voice-drafts").json()
+            all_voice_drafts = requests.get(f"{BACKEND_URL}/voice-drafts").json()
         except:
             st.error("Could not fetch current voice action ledger from backend server gateway.")
             return
@@ -62,7 +65,7 @@ def render_voice_assistant():
                     with st.spinner("Invoking Gemini Voice Intent Engine Layer... Staging Voucher..."):
                         try:
                             res = requests.post(
-                                "http://127.0.0.1:8000/process-voice-action", 
+                                f"{BACKEND_URL}/process-voice-action", 
                                 json={"transcript": clean_speech_text}
                             )
                             if res.status_code == 200:
@@ -270,7 +273,7 @@ def render_voice_assistant():
                     updated_compiled_dict["contactInfo"] = val_contact
                     updated_compiled_dict["confirmationRequired"] = False
                     
-                    requests.post("http://127.0.0.1:8000/voice-drafts/action", json={
+                    requests.post(f"{BACKEND_URL}/voice-drafts/action", json={
                         "voice_id": selected_voice_record["voice_id"],
                         "status": "Approved & Committed",
                         "updated_data": updated_compiled_dict
@@ -283,7 +286,7 @@ def render_voice_assistant():
                     
             with act_col2:
                 if st.button("🗑️ Delete Request", type="secondary", width='stretch'):
-                    requests.post("http://127.0.0.1:8000/voice-drafts/action", json={
+                    requests.post(f"{BACKEND_URL}/voice-drafts/action", json={
                         "voice_id": selected_voice_record["voice_id"],
                         "status": "Rejected & Voided",
                         "updated_data": None

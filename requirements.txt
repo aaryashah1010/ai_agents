@@ -1,5 +1,10 @@
 fastapi
 uvicorn
-google-generativeai
-python-dotenv
 pydantic
+streamlit
+google-genai
+pypdf
+requests
+python-dotenv
+streamlit-mic-recorder
+imaplib2
